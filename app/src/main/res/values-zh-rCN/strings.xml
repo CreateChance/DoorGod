@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">门神</string>
+
+    <string name="menu_title_settings">设置</string>
+    <string name="menu_title_about">关于</string>
+
+    <string name="snack_info">设置已更新</string>
+    <string name="snack_undo">撤销</string>
+</resources>
