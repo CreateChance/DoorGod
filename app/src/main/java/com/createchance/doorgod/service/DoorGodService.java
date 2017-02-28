@@ -3,8 +3,10 @@ package com.createchance.doorgod.service;
 import android.app.Service;
 import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
@@ -44,6 +46,21 @@ public class DoorGodService extends Service {
 
     private List<String> mProtectedAppList;
 
+    private String topPackageName;
+
+    private List<String> mUnlockedAppList = new ArrayList<>();
+
+    private BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+
+            if (action.equals(Intent.ACTION_SCREEN_OFF)) {
+                mUnlockedAppList.clear();
+            }
+        }
+    };
+
     private ServiceBinder mBinder = new ServiceBinder();
     public class ServiceBinder extends Binder {
         public List<AppInfo> getAppList() {
@@ -76,6 +93,11 @@ public class DoorGodService extends Service {
             mProtectedAppList = getProtectedAppList();
         }
 
+        public void addUnlockedApp() {
+            mUnlockedAppList.add(topPackageName);
+            topPackageName = null;
+        }
+
         private void removeAllProtectedApp() {
             DataSupport.deleteAll(ProtectedApplication.class);
         }
@@ -99,6 +121,10 @@ public class DoorGodService extends Service {
         // start working thread.
         mAppStartWatchThread = new AppStartWatchThread();
         mAppStartWatchThread.start();
+
+        // register screen state listener.
+        IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
+        registerReceiver(mReceiver, filter);
     }
 
     @Override
@@ -116,6 +142,8 @@ public class DoorGodService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+
+        unregisterReceiver(mReceiver);
         LogUtil.e(TAG, "Service died, so no apps can be protected!");
     }
 
@@ -145,9 +173,10 @@ public class DoorGodService extends Service {
                 usageStatsMap.put(usageStats.getLastTimeUsed(), usageStats);
             }
             if (!usageStatsMap.isEmpty()) {
-                String topPackageName = usageStatsMap.get(usageStatsMap.lastKey()).getPackageName();
+                topPackageName = usageStatsMap.get(usageStatsMap.lastKey()).getPackageName();
                 LogUtil.d(TAG, "starting: " + topPackageName);
-                if (mProtectedAppList.contains(topPackageName)) {
+                if (mProtectedAppList.contains(topPackageName)
+                        && !mUnlockedAppList.contains(topPackageName)) {
                     Intent intent = new Intent(this, DoorGodActivity.class);
                     startActivity(intent);
                 }
