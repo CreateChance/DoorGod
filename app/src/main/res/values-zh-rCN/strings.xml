@@ -9,6 +9,7 @@
 
     <string name="dialog_title_warning">警告</string>
     <string name="dialog_content_config_changed">当前配置已经改变，您确定要舍弃吗？</string>
+    <string name="toast_info_config_not_saved">配置未保存！</string>
 
     <string name="dialog_content_request_permission">我们需要应用使用情况查看权限才能工作，请授予我们。</string>
     <string name="toast_info_request_permission_failed">门神将不能工作，因为我们没有关键的权限。</string>

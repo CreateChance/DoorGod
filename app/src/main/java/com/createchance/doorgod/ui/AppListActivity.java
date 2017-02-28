@@ -50,6 +50,8 @@ public class AppListActivity extends AppCompatActivity {
 
     private AppAdapter mAppAdapter;
 
+    private HomeKeyWatcher mHomeKeyWatcher;
+
     private DoorGodService.ServiceBinder mService;
 
     private ServiceConnection mConnection = new ServiceConnection() {
@@ -130,6 +132,24 @@ public class AppListActivity extends AppCompatActivity {
         if (!checkIfGetPermission()) {
             showPermissionRequestDialog();
         }
+
+        // watch for home key press event.
+        mHomeKeyWatcher = new HomeKeyWatcher(this);
+        mHomeKeyWatcher.setOnHomePressedListener(new HomeKeyWatcher.OnHomePressedListener() {
+            @Override
+            public void onHomePressed() {
+                if (mAppAdapter.isConfigChanged()) {
+                    Toast.makeText(AppListActivity.this,
+                            R.string.toast_info_config_not_saved, Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onHomeLongPressed() {
+                // do nothing for now.
+            }
+        });
+        mHomeKeyWatcher.startWatch();
     }
 
     @Override
