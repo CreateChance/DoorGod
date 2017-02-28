@@ -1,7 +1,11 @@
 package com.createchance.doorgod.ui;
 
+import android.content.ComponentName;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -16,13 +20,13 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.createchance.doorgod.R;
 import com.createchance.doorgod.adapter.AppAdapter;
 import com.createchance.doorgod.adapter.AppInfo;
+import com.createchance.doorgod.service.DoorGodService;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -35,18 +39,37 @@ public class MainActivity extends AppCompatActivity {
 
     private FloatingActionButton doneBtn;
 
-    private PackageManager mPm;
-
-    private List<AppInfo> mAppInfoList = new ArrayList<>();
+    private List<AppInfo> mAppInfoList;
 
     private AppAdapter mAppAdapter;
+
+    private DoorGodService.ServiceBinder mService;
+
+    private ServiceConnection mConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            mService = (DoorGodService.ServiceBinder) service;
+
+            if (mService != null) {
+                mAppInfoList = mService.getAppList();
+                RecyclerView recyclerView = (RecyclerView) findViewById(R.id.app_list_view);
+                LinearLayoutManager layoutManager = new LinearLayoutManager(MainActivity.this);
+                recyclerView.setLayoutManager(layoutManager);
+                mAppAdapter = new AppAdapter(mAppInfoList, mService);
+                recyclerView.setAdapter(mAppAdapter);
+            }
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            mService = null;
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        mPm = getPackageManager();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -82,22 +105,19 @@ public class MainActivity extends AppCompatActivity {
         doneBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                mService.removeProtectedApp(mAppAdapter.getRemovedAppList());
+                mService.addProtectedApp(mAppAdapter.getAddedAppList());
+                mAppAdapter.getRemovedAppList().clear();
+                mAppAdapter.getAddedAppList().clear();
                 Snackbar.make(view, getString(R.string.snack_info), Snackbar.LENGTH_LONG)
-                        .setAction(getString(R.string.snack_undo), new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                // Invert Selections
-                            }
-                        }).show();
+                        .show();
             }
         });
 
-        initAppList();
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.app_list_view);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(layoutManager);
-        mAppAdapter = new AppAdapter(mAppInfoList);
-        recyclerView.setAdapter(mAppAdapter);
+        // start and bind service.
+        Intent intent = new Intent(MainActivity.this, DoorGodService.class);
+        startService(intent);
+        bindService(intent, mConnection, BIND_AUTO_CREATE);
     }
 
     @Override
@@ -113,18 +133,10 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    private void initAppList() {
-        List<ApplicationInfo> applications = mPm
-                .getInstalledApplications(PackageManager.GET_META_DATA);
-        Collections.sort(applications,
-                new ApplicationInfo.DisplayNameComparator(mPm));
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
 
-        for (ApplicationInfo application:applications) {
-            AppInfo info = new AppInfo();
-            info.setAppIcon(application.loadIcon(mPm));
-            info.setAppName((String) application.loadLabel(mPm));
-            info.setAppPackageName(application.packageName);
-            mAppInfoList.add(info);
-        }
+        unbindService(mConnection);
     }
 }

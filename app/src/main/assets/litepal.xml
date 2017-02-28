@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<litepal>
+    <dbname value="ProtectedApplications"/>
+    <version value="1"/>
+
+    <list>
+        <mapping class="com.createchance.doorgod.database.ProtectedApplication"/>
+    </list>
+</litepal>

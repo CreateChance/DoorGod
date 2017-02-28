@@ -3,6 +3,7 @@
     package="com.createchance.doorgod">
 
     <application
+        android:name="org.litepal.LitePalApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -15,6 +16,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service android:name=".service.DoorGodService"
+            android:exported="true"
+            android:enabled="true"/>
     </application>
 
 </manifest>
