@@ -1,0 +1,53 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.createchance.doorgod.patternlock.PatternLockFragment">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="50dp"
+            android:text="@string/fragment_pattern_view_title"
+            android:textColor="@color/patternViewDot"
+            android:textSize="25sp"/>
+
+        <TextView
+            android:id="@+id/fingerprint_hint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/fragment_pattern_view_fingerprint"
+            android:textColor="@color/patternViewDot"
+            android:textSize="20sp"
+            android:visibility="gone"/>
+
+        <ImageView
+            android:id="@+id/fingerprint_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:src="@drawable/ic_fingerprint_white_48dp"
+            android:visibility="gone"/>
+
+        <com.eftimoff.patternview.PatternView
+            xmlns:patternview="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/patternView"
+            android:layout_gravity="center"
+            android:layout_marginTop="80dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            patternview:dotColor="@color/patternViewDot"
+            patternview:circleColor="@color/patternViewDot"
+            patternview:pathColor="@color/patternViewDot"/>
+
+    </LinearLayout>
+
+</RelativeLayout>

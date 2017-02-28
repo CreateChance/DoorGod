@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.os.IBinder;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -24,7 +25,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.createchance.doorgod.R;
@@ -40,6 +40,8 @@ public class AppListActivity extends AppCompatActivity {
 
     public static final int CODE_REQUEST_PERMISSION = 100;
 
+    public static final int CODE_REQUEST_ENROLL_ACTIVITY = 500;
+
     private DrawerLayout drawerLayout;
 
     private NavigationView navigationView;
@@ -54,12 +56,21 @@ public class AppListActivity extends AppCompatActivity {
 
     private DoorGodService.ServiceBinder mService;
 
+    private SharedPreferences mPrefs;
+    private static final String PATTERN_ENROLL_STATUS = "com.createchance.doorgod.PATTERN_ENROLL_STATUS";
+    private static final String PATTERN_ENROLLED = "ENROLLED";
+
     private ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             mService = (DoorGodService.ServiceBinder) service;
 
             if (mService != null) {
+                if (!isPatternEnrolled()) {
+                    Intent intent = new Intent(AppListActivity.this, EnrollPatternActivity.class);
+                    startActivityForResult(intent, CODE_REQUEST_ENROLL_ACTIVITY);
+                }
+
                 mAppInfoList = mService.getAppList();
                 RecyclerView recyclerView = (RecyclerView) findViewById(R.id.app_list_view);
                 LinearLayoutManager layoutManager = new LinearLayoutManager(AppListActivity.this);
@@ -80,8 +91,8 @@ public class AppListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        this.getWindow().setType(WindowManager.LayoutParams.FIRST_SYSTEM_WINDOW + 4);
-        super.onAttachedToWindow();
+        // get prefs
+        mPrefs = getSharedPreferences(PATTERN_ENROLL_STATUS, MODE_PRIVATE);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -183,6 +194,15 @@ public class AppListActivity extends AppCompatActivity {
                             R.string.toast_info_request_permission_failed, Toast.LENGTH_SHORT).show();
                 }
                 break;
+            case CODE_REQUEST_ENROLL_ACTIVITY:
+                if (resultCode != RESULT_OK) {
+                    finish();
+                } else {
+                    SharedPreferences.Editor editor = mPrefs.edit();
+                    editor.putBoolean(PATTERN_ENROLLED, true);
+                    editor.commit();
+                }
+                break;
             default:
                 break;
         }
@@ -251,5 +271,9 @@ public class AppListActivity extends AppCompatActivity {
         int mode = appOps.checkOpNoThrow("android:get_usage_stats",
                 android.os.Process.myUid(), this.getPackageName());
         return (mode == AppOpsManager.MODE_ALLOWED);
+    }
+
+    private boolean isPatternEnrolled() {
+        return mPrefs.getBoolean(PATTERN_ENROLLED, false);
     }
 }

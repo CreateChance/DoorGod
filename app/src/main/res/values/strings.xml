@@ -18,4 +18,20 @@
 
     <string name="dialog_action_yes">Yes</string>
     <string name="dialog_action_no">No</string>
+
+    <string name="fragment_pattern_view_title">Please draw your pattern</string>
+    <string name="fragment_pattern_view_fingerprint">Finger print can unlock too</string>
+    <string name="fragment_pattern_view_fingerprint_no_enroll">No fingerprint enrolled, click here to enroll</string>
+
+    <string name="fingerprint_auth_failed">Fingerprint Auth failed</string>
+    <string name="fingerprint_auth_error">Fingerprint Auth error</string>
+
+    <string name="pattern_lock_enroll_step1_info">Please draw a pattern</string>
+    <string name="pattern_lock_enroll_step2_info">Please draw a pattern again</string>
+    <string name="pattern_lock_enroll_btn_cancel">Cancel</string>
+    <string name="pattern_lock_enroll_btn_step1">Next</string>
+    <string name="pattern_lock_enroll_btn_step2">OK</string>
+    <string name="pattern_lock_enroll_info_mismatch">Two pattern do not match.Try again!</string>
+    <string name="pattern_lock_enroll_toast_empty">Pattern can not be empty.</string>
+
 </resources>
