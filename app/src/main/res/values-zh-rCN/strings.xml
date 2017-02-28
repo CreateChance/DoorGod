@@ -6,4 +6,9 @@
     <string name="menu_title_about">关于</string>
 
     <string name="snack_info">设置已更新</string>
+
+    <string name="dialog_title_warning">警告</string>
+    <string name="dialog_content_config_changed">当前配置已经改变，您确定要舍弃吗？</string>
+    <string name="dialog_action_yes">是</string>
+    <string name="dialog_action_no">否</string>
 </resources>

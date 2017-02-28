@@ -14,7 +14,6 @@ import com.createchance.doorgod.R;
 import com.createchance.doorgod.service.DoorGodService;
 import com.createchance.doorgod.util.LogUtil;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -27,12 +26,11 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.ViewHolder> {
 
     private Context context;
 
+    private DoorGodService.ServiceBinder mService;
+
     private List<String> protectedAppList;
 
     private List<AppInfo> appInfoList;
-
-    private List<String> addedApp = new ArrayList<>();
-    private List<String> removedApp = new ArrayList<>();
 
     static class ViewHolder extends RecyclerView.ViewHolder {
         CardView cardView;
@@ -54,6 +52,7 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.ViewHolder> {
 
     public AppAdapter(List<AppInfo> list, DoorGodService.ServiceBinder service) {
         this.appInfoList = list;
+        this.mService = service;
         this.protectedAppList = service.getProtectedAppList();
     }
 
@@ -71,10 +70,10 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.ViewHolder> {
                 String pkgName = appInfoList.get(holder.getAdapterPosition()).getAppPackageName();
                 if (((CheckBox)view).isChecked()) {
                     LogUtil.v(TAG, "Ready to add: " + pkgName);
-                    addedApp.add(pkgName);
+                    protectedAppList.add(pkgName);
                 } else {
                     LogUtil.v(TAG, "Ready to remove: " + pkgName);
-                    removedApp.add(pkgName);
+                    protectedAppList.remove(pkgName);
                 }
             }
         });
@@ -98,11 +97,23 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.ViewHolder> {
         return appInfoList.size();
     }
 
-    public List<String> getAddedAppList() {
-        return addedApp;
+    public List<String> getProtectedAppList() {
+        return protectedAppList;
     }
 
-    public List<String> getRemovedAppList() {
-        return removedApp;
+    public boolean isConfigChanged() {
+        // compare to saved configuration.
+        List<String> appList = mService.getProtectedAppList();
+        if (appList.size() == protectedAppList.size()) {
+            for (int i = 0; i < appList.size(); i++) {
+                if (!appList.get(i).equals(protectedAppList.get(i))) {
+                    return true;
+                }
+            }
+        } else {
+            return true;
+        }
+
+        return false;
     }
 }
