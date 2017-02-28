@@ -11,6 +11,10 @@
 
     <string name="dialog_title_warning">Warning</string>
     <string name="dialog_content_config_changed">Configuration has been changed, are you sure to discard?</string>
+
+    <string name="dialog_content_request_permission">We need package usage stats permission to work, please grant it to us.</string>
+    <string name="toast_info_request_permission_failed">Door God may not work now, cause we do not have critical permission.</string>
+
     <string name="dialog_action_yes">Yes</string>
     <string name="dialog_action_no">No</string>
 </resources>

@@ -1,14 +1,21 @@
 package com.createchance.doorgod.ui;
 
+import android.Manifest;
+import android.app.AppOpsManager;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.os.IBinder;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -22,6 +29,7 @@ import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import com.createchance.doorgod.R;
 import com.createchance.doorgod.adapter.AppAdapter;
@@ -33,6 +41,8 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
+
+    public static final int CODE_REQUEST_PERMISSION = 100;
 
     private DrawerLayout drawerLayout;
 
@@ -119,6 +129,11 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(MainActivity.this, DoorGodService.class);
         startService(intent);
         bindService(intent, mConnection, BIND_AUTO_CREATE);
+
+        // check if we have PACKAGE_USAGE_STATS permission.
+        if (!checkIfGetPermission()) {
+            showPermissionRequestDialog();
+        }
     }
 
     @Override
@@ -139,6 +154,22 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
 
         unbindService(mConnection);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode) {
+            case CODE_REQUEST_PERMISSION:
+                if (!checkIfGetPermission()) {
+                    Toast.makeText(MainActivity.this,
+                            R.string.toast_info_request_permission_failed, Toast.LENGTH_SHORT).show();
+                }
+                break;
+            default:
+                break;
+        }
     }
 
     @Override
@@ -173,5 +204,36 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
         builder.create().show();
+    }
+
+    private void showPermissionRequestDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setIcon(R.drawable.ic_warning_white_48dp)
+                .setTitle(R.string.dialog_title_warning)
+                .setCancelable(false)
+                .setMessage(R.string.dialog_content_request_permission)
+                .setPositiveButton(R.string.dialog_action_yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
+                        MainActivity.this.startActivityForResult(intent, CODE_REQUEST_PERMISSION);
+                    }
+                })
+                .setNegativeButton(R.string.dialog_action_no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Toast.makeText(MainActivity.this,
+                                R.string.toast_info_request_permission_failed, Toast.LENGTH_SHORT).show();
+                    }
+                });
+        builder.create().show();
+    }
+
+    private boolean checkIfGetPermission() {
+        AppOpsManager appOps = (AppOpsManager) this
+                .getSystemService(Context.APP_OPS_SERVICE);
+        int mode = appOps.checkOpNoThrow("android:get_usage_stats",
+                android.os.Process.myUid(), this.getPackageName());
+        return (mode == AppOpsManager.MODE_ALLOWED);
     }
 }
