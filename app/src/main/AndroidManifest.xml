@@ -12,10 +12,11 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:resizeableActivity="false"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        android:resizeableActivity="false">
-        <activity android:name=".ui.MainActivity"
+        android:theme="@style/AppTheme">
+        <activity
+            android:name=".ui.AppListActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -24,9 +25,13 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".service.DoorGodService"
-            android:exported="true"
-            android:enabled="true"/>
+        <service
+            android:name=".service.DoorGodService"
+            android:enabled="true"
+            android:exported="true" />
+
+        <activity android:name=".ui.DoorGodActivity"
+            android:launchMode="singleInstance"/>
     </application>
 
 </manifest>

@@ -1,21 +1,17 @@
 package com.createchance.doorgod.ui;
 
-import android.Manifest;
 import android.app.AppOpsManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.content.pm.PackageManager;
 import android.os.IBinder;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -38,9 +34,9 @@ import com.createchance.doorgod.service.DoorGodService;
 
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class AppListActivity extends AppCompatActivity {
 
-    private static final String TAG = "MainActivity";
+    private static final String TAG = "AppListActivity";
 
     public static final int CODE_REQUEST_PERMISSION = 100;
 
@@ -64,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
             if (mService != null) {
                 mAppInfoList = mService.getAppList();
                 RecyclerView recyclerView = (RecyclerView) findViewById(R.id.app_list_view);
-                LinearLayoutManager layoutManager = new LinearLayoutManager(MainActivity.this);
+                LinearLayoutManager layoutManager = new LinearLayoutManager(AppListActivity.this);
                 recyclerView.setLayoutManager(layoutManager);
                 mAppAdapter = new AppAdapter(mAppInfoList, mService);
                 recyclerView.setAdapter(mAppAdapter);
@@ -126,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // start and bind service.
-        Intent intent = new Intent(MainActivity.this, DoorGodService.class);
+        Intent intent = new Intent(AppListActivity.this, DoorGodService.class);
         startService(intent);
         bindService(intent, mConnection, BIND_AUTO_CREATE);
 
@@ -163,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
         switch (requestCode) {
             case CODE_REQUEST_PERMISSION:
                 if (!checkIfGetPermission()) {
-                    Toast.makeText(MainActivity.this,
+                    Toast.makeText(AppListActivity.this,
                             R.string.toast_info_request_permission_failed, Toast.LENGTH_SHORT).show();
                 }
                 break;
@@ -216,13 +212,13 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
-                        MainActivity.this.startActivityForResult(intent, CODE_REQUEST_PERMISSION);
+                        AppListActivity.this.startActivityForResult(intent, CODE_REQUEST_PERMISSION);
                     }
                 })
                 .setNegativeButton(R.string.dialog_action_no, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(MainActivity.this,
+                        Toast.makeText(AppListActivity.this,
                                 R.string.toast_info_request_permission_failed, Toast.LENGTH_SHORT).show();
                     }
                 });
