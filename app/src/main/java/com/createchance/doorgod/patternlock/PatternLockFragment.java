@@ -9,6 +9,7 @@ import android.provider.Settings;
 import android.support.v4.app.Fragment;
 import android.support.v4.hardware.fingerprint.FingerprintManagerCompat;
 import android.support.v4.os.CancellationSignal;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,10 +17,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.createchance.doorgod.R;
+import com.createchance.doorgod.database.PatternLockInfo;
 import com.createchance.doorgod.fingerprint.CryptoObjectHelper;
 import com.createchance.doorgod.fingerprint.MyAuthCallback;
+import com.createchance.doorgod.ui.DoorGodActivity;
 import com.createchance.doorgod.util.LogUtil;
 import com.createchance.doorgod.util.MsgUtil;
+import com.eftimoff.patternview.PatternView;
+
+import org.litepal.crud.DataSupport;
+
+import java.util.List;
 
 public class PatternLockFragment extends Fragment {
 
@@ -30,6 +38,8 @@ public class PatternLockFragment extends Fragment {
     private CancellationSignal cancellationSignal = null;
 
     private TextView fingerprintInfo;
+
+    private PatternView patternView;
 
     private Handler mHandler = new Handler() {
         @Override
@@ -73,7 +83,7 @@ public class PatternLockFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_pattern_lock, container, false);
@@ -109,6 +119,21 @@ public class PatternLockFragment extends Fragment {
                 });
             }
         }
+        patternView = (PatternView) view.findViewById(R.id.patternView);
+        patternView.setOnPatternDetectedListener(new PatternView.OnPatternDetectedListener() {
+            @Override
+            public void onPatternDetected() {
+                LogUtil.d(TAG, "pattern detected.");
+                List<PatternLockInfo> patternLockInfos = DataSupport.findAll(PatternLockInfo.class);
+                for (PatternLockInfo info : patternLockInfos) {
+                    if (patternView.getPatternString().equals(info.getPatternString())) {
+                        ((DoorGodActivity)getActivity()).getService().addUnlockedApp();
+                        getActivity().finish();
+                        break;
+                    }
+                }
+            }
+        });
 
         return view;
     }
