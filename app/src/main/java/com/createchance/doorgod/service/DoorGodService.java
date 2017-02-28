@@ -29,8 +29,6 @@ public class DoorGodService extends Service {
 
     private List<AppInfo> mAppInfoList = new ArrayList<>();
 
-    private List<String> mProtectedAppList = new ArrayList<>();
-
     private PackageManager mPm;
 
     private ServiceBinder mBinder = new ServiceBinder();
@@ -40,17 +38,20 @@ public class DoorGodService extends Service {
         }
 
         public List<String> getProtectedAppList() {
-            mProtectedAppList.clear();
+            List<String> applist = new ArrayList<>();
 
             List<ProtectedApplication> applicationList = DataSupport.findAll(ProtectedApplication.class);
             for (ProtectedApplication application: applicationList) {
-                mProtectedAppList.add(application.getPackageName());
+                applist.add(application.getPackageName());
             }
 
-            return mProtectedAppList;
+            return applist;
         }
 
         public void addProtectedApp(List<String> list) {
+            // remove all the apps first.
+            removeAllProtectedApp();
+            // then add protected apps.
             for (String app:list) {
                 LogUtil.d(TAG, "add app: " + app);
                 ProtectedApplication application = new ProtectedApplication();
@@ -59,11 +60,8 @@ public class DoorGodService extends Service {
             }
         }
 
-        public void removeProtectedApp(List<String> list) {
-            for (String app:list) {
-                LogUtil.d(TAG, "remove app: " + app);
-                DataSupport.deleteAll(ProtectedApplication.class, "packageName = ?", app);
-            }
+        private void removeAllProtectedApp() {
+            DataSupport.deleteAll(ProtectedApplication.class);
         }
     }
 

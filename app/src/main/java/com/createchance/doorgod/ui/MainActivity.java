@@ -1,10 +1,9 @@
 package com.createchance.doorgod.ui;
 
 import android.content.ComponentName;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -13,14 +12,16 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
+import android.view.WindowManager;
 
 import com.createchance.doorgod.R;
 import com.createchance.doorgod.adapter.AppAdapter;
@@ -71,6 +72,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        this.getWindow().setType(WindowManager.LayoutParams.FIRST_SYSTEM_WINDOW + 4);
+        super.onAttachedToWindow();
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -105,10 +109,7 @@ public class MainActivity extends AppCompatActivity {
         doneBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mService.removeProtectedApp(mAppAdapter.getRemovedAppList());
-                mService.addProtectedApp(mAppAdapter.getAddedAppList());
-                mAppAdapter.getRemovedAppList().clear();
-                mAppAdapter.getAddedAppList().clear();
+                mService.addProtectedApp(mAppAdapter.getProtectedAppList());
                 Snackbar.make(view, getString(R.string.snack_info), Snackbar.LENGTH_LONG)
                         .show();
             }
@@ -138,5 +139,39 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
 
         unbindService(mConnection);
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (mAppAdapter.isConfigChanged() && (keyCode == KeyEvent.KEYCODE_BACK)) {
+            showConfigChangedDialog();
+
+            return true;
+        }
+
+        return super.onKeyDown(keyCode, event);
+    }
+
+    private void showConfigChangedDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setIcon(R.drawable.ic_warning_white_48dp)
+                .setTitle(R.string.dialog_title_warning)
+                .setCancelable(false)
+                .setMessage(R.string.dialog_content_config_changed)
+                .setPositiveButton(R.string.dialog_action_yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // User choose to discard changes, so we just quit.
+                        dialog.dismiss();
+                        finish();
+                    }
+                })
+                .setNegativeButton(R.string.dialog_action_no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        builder.create().show();
     }
 }

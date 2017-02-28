@@ -8,4 +8,9 @@
     <string name="menu_title_about">About</string>
 
     <string name="snack_info">Settings updated.</string>
+
+    <string name="dialog_title_warning">Warning</string>
+    <string name="dialog_content_config_changed">Configuration has been changed, are you sure to discard?</string>
+    <string name="dialog_action_yes">Yes</string>
+    <string name="dialog_action_no">No</string>
 </resources>
