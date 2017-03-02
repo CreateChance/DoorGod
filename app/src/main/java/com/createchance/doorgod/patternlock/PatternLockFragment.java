@@ -2,6 +2,7 @@ package com.createchance.doorgod.patternlock;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -49,6 +50,7 @@ public class PatternLockFragment extends Fragment {
             LogUtil.d(TAG, "msg: " + msg.what + " ,arg1: " + msg.arg1);
             switch (msg.what) {
                 case MsgUtil.MSG_AUTH_SUCCESS:
+                    ((DoorGodActivity)getActivity()).getService().addUnlockedApp();
                     getActivity().finish();
                     cancellationSignal = null;
                     break;
@@ -124,13 +126,13 @@ public class PatternLockFragment extends Fragment {
             @Override
             public void onPatternDetected() {
                 LogUtil.d(TAG, "pattern detected.");
-                List<PatternLockInfo> patternLockInfos = DataSupport.findAll(PatternLockInfo.class);
-                for (PatternLockInfo info : patternLockInfos) {
-                    if (patternView.getPatternString().equals(info.getPatternString())) {
-                        ((DoorGodActivity)getActivity()).getService().addUnlockedApp();
-                        getActivity().finish();
-                        break;
-                    }
+                PatternLockInfo patternLockInfo = DataSupport.findFirst(PatternLockInfo.class);
+                if (patternView.getPatternString().equals(patternLockInfo.getPatternString())) {
+                    ((DoorGodActivity)getActivity()).getService().addUnlockedApp();
+                    getActivity().finish();
+                } else {
+                    patternView.setDisplayMode(PatternView.DisplayMode.Wrong);
+                    patternView.clearPattern(1000);
                 }
             }
         });

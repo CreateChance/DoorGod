@@ -181,6 +181,8 @@ public class AppListActivity extends AppCompatActivity {
         super.onDestroy();
 
         unbindService(mConnection);
+
+        mHomeKeyWatcher.stopWatch();
     }
 
     @Override
