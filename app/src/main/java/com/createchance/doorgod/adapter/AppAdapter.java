@@ -64,6 +64,7 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.ViewHolder> {
 
         View view = LayoutInflater.from(context).inflate(R.layout.app_item, parent, false);
         final ViewHolder holder = new ViewHolder(view);
+
         holder.appCheckedView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -89,6 +90,8 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.ViewHolder> {
         holder.appPackageNameView.setText(info.getAppPackageName());
         if (protectedAppList.contains(info.getAppPackageName())) {
             holder.appCheckedView.setChecked(true);
+        } else {
+            holder.appCheckedView.setChecked(false);
         }
     }
 
