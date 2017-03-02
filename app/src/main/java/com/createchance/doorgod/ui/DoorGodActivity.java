@@ -42,6 +42,15 @@ public class DoorGodActivity extends AppCompatActivity {
         unbindService(mConnection);
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
+        Intent i = new Intent(Intent.ACTION_MAIN);
+        i.addCategory(Intent.CATEGORY_HOME);
+        startActivity(i);
+    }
+
     public DoorGodService.ServiceBinder getService() {
         return mService;
     }
