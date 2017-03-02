@@ -166,7 +166,8 @@ public class DoorGodService extends Service {
 
     private void checkIfNeedProtection() {
         long time = System.currentTimeMillis();
-        List<UsageStats> usageStatsList = mUsageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_BEST, time - 2000, time);
+        List<UsageStats> usageStatsList = mUsageStatsManager.
+                queryUsageStats(UsageStatsManager.INTERVAL_BEST, time - 2000, time);
 
         if (usageStatsList != null && !usageStatsList.isEmpty()) {
             SortedMap<Long, UsageStats> usageStatsMap = new TreeMap<>();
@@ -178,9 +179,10 @@ public class DoorGodService extends Service {
                 LogUtil.d(TAG, "starting: " + topPackageName);
                 if (mProtectedAppList.contains(topPackageName)
                         && !mUnlockedAppList.contains(topPackageName)) {
-                    Intent intent = new Intent(this, DoorGodActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
+                    Intent intent = new Intent(DoorGodService.this, DoorGodActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+                    DoorGodService.this.startActivity(intent);
                     currentLockedApp = topPackageName;
                 }
             }
@@ -194,7 +196,7 @@ public class DoorGodService extends Service {
 
             while (true) {
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(500);
                     checkIfNeedProtection();
                 } catch (InterruptedException e) {
                     e.printStackTrace();

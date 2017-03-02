@@ -6,11 +6,7 @@ import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-
 import com.createchance.doorgod.R;
-import com.createchance.doorgod.adapter.AppAdapter;
 import com.createchance.doorgod.service.DoorGodService;
 
 public class DoorGodActivity extends AppCompatActivity {
