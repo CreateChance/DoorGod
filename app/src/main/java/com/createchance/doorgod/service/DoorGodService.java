@@ -7,7 +7,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Binder;
@@ -15,8 +14,10 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 
 import com.createchance.doorgod.adapter.AppInfo;
+import com.createchance.doorgod.database.LockInfo;
 import com.createchance.doorgod.database.ProtectedApplication;
 import com.createchance.doorgod.ui.DoorGodActivity;
+import com.createchance.doorgod.util.LockTypeUtil;
 import com.createchance.doorgod.util.LogUtil;
 
 import org.litepal.crud.DataSupport;
@@ -27,6 +28,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.concurrent.locks.Lock;
 
 /**
  * Door God Service.
@@ -49,6 +51,8 @@ public class DoorGodService extends Service {
     private String currentLockedApp;
 
     private List<String> mUnlockedAppList = new ArrayList<>();
+
+    private int lockType = -1;
 
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
@@ -97,6 +101,30 @@ public class DoorGodService extends Service {
             LogUtil.d(TAG, "add unlock app: " + currentLockedApp);
             mUnlockedAppList.add(currentLockedApp);
             currentLockedApp = null;
+        }
+
+        // save lock info: lock string and type
+        public void saveLockInfo(String lockString, int type) {
+            DataSupport.deleteAll(LockInfo.class);
+
+            LockInfo info = new LockInfo();
+            info.setLockString(lockString);
+            info.setLockType(type);
+            info.save();
+            lockType = type;
+        }
+
+        public int getLockType() {
+            if (lockType == -1) {
+                LockInfo info = DataSupport.findFirst(LockInfo.class);
+                if (info != null) {
+                    lockType = info.getLockType();
+                } else {
+                    LogUtil.d(TAG, "info is null.");
+                }
+            }
+
+            return lockType;
         }
 
         private void removeAllProtectedApp() {

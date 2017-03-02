@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="lock_type">
+        <item>@string/settings_lock_type_pattern</item>
+        <item>@string/settings_lock_type_pin</item>
+    </string-array>
+</resources>

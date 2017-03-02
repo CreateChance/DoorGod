@@ -42,14 +42,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/pattern_lock_enroll_btn_cancel" />
+            android:text="@string/lock_enroll_btn_cancel" />
 
         <Button
             android:id="@+id/btn_ok"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/pattern_lock_enroll_btn_step1" />
+            android:text="@string/lock_enroll_btn_step1" />
 
     </LinearLayout>
 

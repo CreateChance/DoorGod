@@ -23,15 +23,29 @@
     <string name="fragment_pattern_view_fingerprint">Finger print can unlock too</string>
     <string name="fragment_pattern_view_fingerprint_no_enroll">No fingerprint enrolled, click here to enroll</string>
 
+    <string name="fragment_pin_lock_view_title">Input PIN code</string>
+
     <string name="fingerprint_auth_failed">Fingerprint Auth failed</string>
     <string name="fingerprint_auth_error">Fingerprint Auth error</string>
 
+    <string name="lock_enroll_btn_cancel">Cancel</string>
+    <string name="lock_enroll_btn_step1">Next</string>
+    <string name="lock_enroll_btn_step2">OK</string>
+
     <string name="pattern_lock_enroll_step1_info">Please draw a pattern</string>
     <string name="pattern_lock_enroll_step2_info">Please draw a pattern again</string>
-    <string name="pattern_lock_enroll_btn_cancel">Cancel</string>
-    <string name="pattern_lock_enroll_btn_step1">Next</string>
-    <string name="pattern_lock_enroll_btn_step2">OK</string>
-    <string name="pattern_lock_enroll_info_mismatch">Two pattern do not match.Try again!</string>
+    <string name="pattern_lock_enroll_info_mismatch">Two pattern mismatch.Try again!</string>
     <string name="pattern_lock_enroll_toast_empty">Pattern can not be empty.</string>
+
+    <string name="pin_lock_enroll_step1_info">Input four numbers</string>
+    <string name="pin_lock_enroll_step2_info">Input again</string>
+    <string name="pin_lock_enroll_info_mismatch">Two PIN code mismatch.Try again!</string>
+    <string name="pin_lock_enroll_toast_empty">PIN can not be empty.</string>
+
+    <string name="settings_lock_type_title">Set Lock type</string>
+    <string name="settings_lock_type_pattern">Pattern</string>
+    <string name="settings_lock_type_pin">PIN</string>
+
+    <string name="first_start_info">This is first start, please set a lock type.</string>
 
 </resources>

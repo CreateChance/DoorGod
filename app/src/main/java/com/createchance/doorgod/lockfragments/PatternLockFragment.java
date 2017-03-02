@@ -1,8 +1,7 @@
-package com.createchance.doorgod.patternlock;
+package com.createchance.doorgod.lockfragments;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -10,7 +9,6 @@ import android.provider.Settings;
 import android.support.v4.app.Fragment;
 import android.support.v4.hardware.fingerprint.FingerprintManagerCompat;
 import android.support.v4.os.CancellationSignal;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +16,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.createchance.doorgod.R;
-import com.createchance.doorgod.database.PatternLockInfo;
+import com.createchance.doorgod.database.LockInfo;
 import com.createchance.doorgod.fingerprint.CryptoObjectHelper;
 import com.createchance.doorgod.fingerprint.MyAuthCallback;
 import com.createchance.doorgod.ui.DoorGodActivity;
@@ -27,8 +25,6 @@ import com.createchance.doorgod.util.MsgUtil;
 import com.eftimoff.patternview.PatternView;
 
 import org.litepal.crud.DataSupport;
-
-import java.util.List;
 
 public class PatternLockFragment extends Fragment {
 
@@ -126,8 +122,8 @@ public class PatternLockFragment extends Fragment {
             @Override
             public void onPatternDetected() {
                 LogUtil.d(TAG, "pattern detected.");
-                PatternLockInfo patternLockInfo = DataSupport.findFirst(PatternLockInfo.class);
-                if (patternView.getPatternString().equals(patternLockInfo.getPatternString())) {
+                LockInfo lockInfo = DataSupport.findFirst(LockInfo.class);
+                if (patternView.getPatternString().equals(lockInfo.getLockString())) {
                     ((DoorGodActivity)getActivity()).getService().addUnlockedApp();
                     getActivity().finish();
                 } else {

@@ -34,8 +34,10 @@
         <activity
             android:name=".ui.DoorGodActivity"
             android:launchMode="singleInstance"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".ui.EnrollPatternActivity"/>
+            android:screenOrientation="portrait" />
+        <activity android:name=".ui.EnrollPatternActivity" />
+        <activity android:name=".ui.EnrollPinActivity" />
+        <activity android:name=".ui.SettingsActivity"></activity>
     </application>
 
 </manifest>

@@ -17,15 +17,29 @@
     <string name="dialog_action_yes">是</string>
     <string name="dialog_action_no">否</string>
 
+    <string name="lock_enroll_btn_cancel">取消</string>
+    <string name="lock_enroll_btn_step1">下一步</string>
+    <string name="lock_enroll_btn_step2">确定</string>
+
     <string name="fragment_pattern_view_title">请绘制您的图案</string>
     <string name="fragment_pattern_view_fingerprint">指纹也可解锁</string>
     <string name="fragment_pattern_view_fingerprint_no_enroll">暂无指纹注册，点击这里注册</string>
 
+    <string name="fragment_pin_lock_view_title">请输入密码</string>
+
     <string name="fingerprint_auth_failed">指纹认证失败</string>
     <string name="fingerprint_auth_error">指纹认证错误</string>
-    <string name="pattern_lock_enroll_btn_cancel">取消</string>
-    <string name="pattern_lock_enroll_btn_step1">下一步</string>
-    <string name="pattern_lock_enroll_btn_step2">确定</string>
     <string name="pattern_lock_enroll_info_mismatch">两次输入不匹配，请重试！</string>
     <string name="pattern_lock_enroll_toast_empty">图案不能是空</string>
+
+    <string name="pin_lock_enroll_step1_info">输入4位数字</string>
+    <string name="pin_lock_enroll_step2_info">再次输入</string>
+    <string name="pin_lock_enroll_info_mismatch">两次密码不匹配，请重试！</string>
+    <string name="pin_lock_enroll_toast_empty">密码不能是空</string>
+
+    <string name="settings_lock_type_title">设置锁屏方式</string>
+    <string name="settings_lock_type_pattern">图案</string>
+    <string name="settings_lock_type_pin">PIN码</string>
+
+    <string name="first_start_info">这是第一次运行，请设置锁屏方式。</string>
 </resources>

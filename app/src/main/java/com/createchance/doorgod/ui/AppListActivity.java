@@ -40,8 +40,6 @@ public class AppListActivity extends AppCompatActivity {
 
     public static final int CODE_REQUEST_PERMISSION = 100;
 
-    public static final int CODE_REQUEST_ENROLL_ACTIVITY = 500;
-
     private DrawerLayout drawerLayout;
 
     private NavigationView navigationView;
@@ -57,8 +55,8 @@ public class AppListActivity extends AppCompatActivity {
     private DoorGodService.ServiceBinder mService;
 
     private SharedPreferences mPrefs;
-    private static final String PATTERN_ENROLL_STATUS = "com.createchance.doorgod.PATTERN_ENROLL_STATUS";
-    private static final String PATTERN_ENROLLED = "ENROLLED";
+    private static final String LOCK_ENROLL_STATUS = "com.createchance.doorgod.LOCK_ENROLL_STATUS";
+    private static final String LOCK_ENROLLED = "ENROLLED";
 
     private ServiceConnection mConnection = new ServiceConnection() {
         @Override
@@ -67,8 +65,10 @@ public class AppListActivity extends AppCompatActivity {
 
             if (mService != null) {
                 if (!isPatternEnrolled()) {
-                    Intent intent = new Intent(AppListActivity.this, EnrollPatternActivity.class);
-                    startActivityForResult(intent, CODE_REQUEST_ENROLL_ACTIVITY);
+                    Toast.makeText(AppListActivity.this,
+                            R.string.first_start_info, Toast.LENGTH_LONG).show();
+                    Intent intent = new Intent(AppListActivity.this, SettingsActivity.class);
+                    startActivity(intent);
                 }
 
                 mAppInfoList = mService.getAppList();
@@ -92,7 +92,7 @@ public class AppListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // get prefs
-        mPrefs = getSharedPreferences(PATTERN_ENROLL_STATUS, MODE_PRIVATE);
+        mPrefs = getSharedPreferences(LOCK_ENROLL_STATUS, MODE_PRIVATE);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -111,6 +111,8 @@ public class AppListActivity extends AppCompatActivity {
                 switch (item.getItemId()) {
                     case R.id.nav_settings:
                         // do settings.
+                        Intent intent = new Intent(AppListActivity.this, SettingsActivity.class);
+                        startActivity(intent);
                         break;
                     case R.id.nav_about:
                         // show about info.
@@ -196,15 +198,6 @@ public class AppListActivity extends AppCompatActivity {
                             R.string.toast_info_request_permission_failed, Toast.LENGTH_SHORT).show();
                 }
                 break;
-            case CODE_REQUEST_ENROLL_ACTIVITY:
-                if (resultCode != RESULT_OK) {
-                    finish();
-                } else {
-                    SharedPreferences.Editor editor = mPrefs.edit();
-                    editor.putBoolean(PATTERN_ENROLLED, true);
-                    editor.commit();
-                }
-                break;
             default:
                 break;
         }
@@ -276,6 +269,6 @@ public class AppListActivity extends AppCompatActivity {
     }
 
     private boolean isPatternEnrolled() {
-        return mPrefs.getBoolean(PATTERN_ENROLLED, false);
+        return mPrefs.getBoolean(LOCK_ENROLLED, false);
     }
 }

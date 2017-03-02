@@ -4,10 +4,16 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import com.createchance.doorgod.R;
+import com.createchance.doorgod.lockfragments.PatternLockFragment;
+import com.createchance.doorgod.lockfragments.PinLockFragment;
 import com.createchance.doorgod.service.DoorGodService;
+import com.createchance.doorgod.util.LockTypeUtil;
+import com.createchance.doorgod.util.LogUtil;
 
 public class DoorGodActivity extends AppCompatActivity {
 
@@ -18,6 +24,8 @@ public class DoorGodActivity extends AppCompatActivity {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             mService = (DoorGodService.ServiceBinder) service;
+
+            addFragment(mService.getLockType());
         }
 
         @Override
@@ -53,5 +61,17 @@ public class DoorGodActivity extends AppCompatActivity {
 
     public DoorGodService.ServiceBinder getService() {
         return mService;
+    }
+
+    private void addFragment(int type) {
+        LogUtil.d(TAG, "type: " + type);
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        if (type == LockTypeUtil.TYPE_PIN) {
+            transaction.add(R.id.lock_fragment_container, new PinLockFragment());
+        } else if (type == LockTypeUtil.TYPE_PATTERN) {
+            transaction.add(R.id.lock_fragment_container, new PatternLockFragment());
+        }
+        transaction.commit();
     }
 }

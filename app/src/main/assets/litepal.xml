@@ -5,6 +5,6 @@
 
     <list>
         <mapping class="com.createchance.doorgod.database.ProtectedApplication"/>
-        <mapping class="com.createchance.doorgod.database.PatternLockInfo"/>
+        <mapping class="com.createchance.doorgod.database.LockInfo"/>
     </list>
 </litepal>
