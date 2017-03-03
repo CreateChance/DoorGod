@@ -85,7 +85,7 @@ public class SettingsActivity extends AppCompatActivity {
                 builder.setIcon(R.drawable.ic_settings_white_48dp)
                         .setTitle(R.string.settings_lock_type_title)
                         .setSingleChoiceItems(R.array.lock_type,
-                                mService.getLockType() == LockTypeUtil.TYPE_PATTERN ? 0 : 1,
+                                getSelectedPos(mService.getLockType()),
                                 new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
@@ -105,5 +105,15 @@ public class SettingsActivity extends AppCompatActivity {
             default:
                 break;
         }
+    }
+
+    private int getSelectedPos(int locktype) {
+        if (locktype == LockTypeUtil.TYPE_PATTERN) {
+            return 0;
+        } else if (locktype == LockTypeUtil.TYPE_PIN) {
+            return 1;
+        }
+
+        return -1;
     }
 }
