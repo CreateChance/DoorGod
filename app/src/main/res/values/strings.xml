@@ -48,4 +48,6 @@
 
     <string name="first_start_info">This is first start, please set a lock type.</string>
 
+    <string name="no_lock_type_enrolled_warning">You MUST set one lock!</string>
+
 </resources>

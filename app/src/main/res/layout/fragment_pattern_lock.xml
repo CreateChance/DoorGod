@@ -26,16 +26,14 @@
             android:layout_gravity="center_horizontal"
             android:text="@string/fragment_pattern_view_fingerprint"
             android:textColor="@color/patternViewDot"
-            android:textSize="20sp"
-            android:visibility="gone"/>
+            android:textSize="20sp"/>
 
         <ImageView
             android:id="@+id/fingerprint_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:src="@drawable/ic_fingerprint_white_48dp"
-            android:visibility="gone"/>
+            android:src="@drawable/ic_fingerprint_white_48dp"/>
 
         <com.eftimoff.patternview.PatternView
             xmlns:patternview="http://schemas.android.com/apk/res-auto"

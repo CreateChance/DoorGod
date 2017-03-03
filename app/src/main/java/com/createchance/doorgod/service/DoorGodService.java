@@ -61,6 +61,11 @@ public class DoorGodService extends Service {
 
             if (action.equals(Intent.ACTION_SCREEN_OFF)) {
                 mUnlockedAppList.clear();
+
+                // we go to home screen now.
+                Intent i = new Intent(Intent.ACTION_MAIN);
+                i.addCategory(Intent.CATEGORY_HOME);
+                startActivity(i);
             }
         }
     };

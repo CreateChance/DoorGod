@@ -54,29 +54,20 @@ public class AppListActivity extends AppCompatActivity {
 
     private DoorGodService.ServiceBinder mService;
 
-    private SharedPreferences mPrefs;
-    private static final String LOCK_ENROLL_STATUS = "com.createchance.doorgod.LOCK_ENROLL_STATUS";
-    private static final String LOCK_ENROLLED = "ENROLLED";
-
     private ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             mService = (DoorGodService.ServiceBinder) service;
 
             if (mService != null) {
-                if (!isPatternEnrolled()) {
-                    Toast.makeText(AppListActivity.this,
-                            R.string.first_start_info, Toast.LENGTH_LONG).show();
-                    Intent intent = new Intent(AppListActivity.this, SettingsActivity.class);
-                    startActivity(intent);
+                if (mAppInfoList == null) {
+                    mAppInfoList = mService.getAppList();
+                    RecyclerView recyclerView = (RecyclerView) findViewById(R.id.app_list_view);
+                    LinearLayoutManager layoutManager = new LinearLayoutManager(AppListActivity.this);
+                    recyclerView.setLayoutManager(layoutManager);
+                    mAppAdapter = new AppAdapter(mAppInfoList, mService);
+                    recyclerView.setAdapter(mAppAdapter);
                 }
-
-                mAppInfoList = mService.getAppList();
-                RecyclerView recyclerView = (RecyclerView) findViewById(R.id.app_list_view);
-                LinearLayoutManager layoutManager = new LinearLayoutManager(AppListActivity.this);
-                recyclerView.setLayoutManager(layoutManager);
-                mAppAdapter = new AppAdapter(mAppInfoList, mService);
-                recyclerView.setAdapter(mAppAdapter);
             }
         }
 
@@ -91,8 +82,9 @@ public class AppListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // get prefs
-        mPrefs = getSharedPreferences(LOCK_ENROLL_STATUS, MODE_PRIVATE);
+        // bind to service
+        Intent intent = new Intent(AppListActivity.this, DoorGodService.class);
+        bindService(intent, mConnection, BIND_AUTO_CREATE);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -136,11 +128,6 @@ public class AppListActivity extends AppCompatActivity {
             }
         });
 
-        // start and bind service.
-        Intent intent = new Intent(AppListActivity.this, DoorGodService.class);
-        startService(intent);
-        bindService(intent, mConnection, BIND_AUTO_CREATE);
-
         // check if we have PACKAGE_USAGE_STATS permission.
         if (!checkIfGetPermission()) {
             showPermissionRequestDialog();
@@ -163,6 +150,13 @@ public class AppListActivity extends AppCompatActivity {
             }
         });
         mHomeKeyWatcher.startWatch();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+
     }
 
     @Override
@@ -266,9 +260,5 @@ public class AppListActivity extends AppCompatActivity {
         int mode = appOps.checkOpNoThrow("android:get_usage_stats",
                 android.os.Process.myUid(), this.getPackageName());
         return (mode == AppOpsManager.MODE_ALLOWED);
-    }
-
-    private boolean isPatternEnrolled() {
-        return mPrefs.getBoolean(LOCK_ENROLLED, false);
     }
 }
