@@ -7,8 +7,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
@@ -17,7 +17,6 @@ import com.createchance.doorgod.adapter.AppInfo;
 import com.createchance.doorgod.database.LockInfo;
 import com.createchance.doorgod.database.ProtectedApplication;
 import com.createchance.doorgod.ui.DoorGodActivity;
-import com.createchance.doorgod.util.LockTypeUtil;
 import com.createchance.doorgod.util.LogUtil;
 
 import org.litepal.crud.DataSupport;
@@ -25,10 +24,11 @@ import org.litepal.tablemanager.Connector;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.concurrent.locks.Lock;
 
 /**
  * Door God Service.
@@ -178,17 +178,24 @@ public class DoorGodService extends Service {
 
     private void initAppList() {
         LogUtil.d(TAG, "Init installed app list.");
-        List<ApplicationInfo> applications = mPm
-                .getInstalledApplications(0);
-        Collections.sort(applications,
-                new ApplicationInfo.DisplayNameComparator(mPm));
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_LAUNCHER);
+        List<ResolveInfo> homeApps = mPm.queryIntentActivities(intent, 0);
 
-        for (ApplicationInfo application:applications) {
-            AppInfo info = new AppInfo();
-            info.setAppIcon(application.loadIcon(mPm));
-            info.setAppName((String) application.loadLabel(mPm));
-            info.setAppPackageName(application.packageName);
-            mAppInfoList.add(info);
+        // sort the results
+        Collections.sort(homeApps, new ResolveInfo.DisplayNameComparator(mPm));
+
+        Set<String> packageNameSet = new HashSet<>();
+        for (ResolveInfo info : homeApps) {
+            if (!packageNameSet.contains(info.activityInfo.packageName)) {
+                packageNameSet.add(info.activityInfo.packageName);
+                AppInfo appInfo = new AppInfo();
+                appInfo.setAppPackageName(info.activityInfo.packageName);
+                appInfo.setAppName((String) info.activityInfo.applicationInfo.loadLabel(mPm));
+                appInfo.setAppIcon(info.activityInfo.applicationInfo.loadIcon(mPm));
+                mAppInfoList.add(appInfo);
+            }
         }
     }
 
