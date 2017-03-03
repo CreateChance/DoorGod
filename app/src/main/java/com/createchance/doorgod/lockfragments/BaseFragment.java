@@ -24,6 +24,8 @@ public abstract class BaseFragment extends Fragment {
     protected boolean noFingerprintEnrolled = false;
     protected boolean noFingerprintDetected = false;
 
+    private boolean isFingerprintWorking = false;
+
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -77,6 +79,7 @@ public abstract class BaseFragment extends Fragment {
                     LogUtil.d(TAG, "Now we start listen for finger print auth.");
                     fingerprintManager.authenticate(cryptoObjectHelper.buildCryptoObject(), 0,
                             cancellationSignal, myAuthCallback, null);
+                    isFingerprintWorking = true;
                 } catch (Exception e) {
                     e.printStackTrace();
                     mHandler.obtainMessage(MsgUtil.MSG_AUTH_ERROR).sendToTarget();
@@ -102,4 +105,8 @@ public abstract class BaseFragment extends Fragment {
     public abstract void onFingerprintFailed();
 
     public abstract void onFingerprintError();
+
+    public boolean isFingerprintWorking() {
+        return isFingerprintWorking;
+    }
 }

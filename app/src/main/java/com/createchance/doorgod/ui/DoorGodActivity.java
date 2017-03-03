@@ -108,7 +108,11 @@ public class DoorGodActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         if (isLaunchFromHome) {
-            fragment.cancelFingerprint();
+            if (fragment.isFingerprintWorking()) {
+                fragment.cancelFingerprint();
+            } else {
+                super.onBackPressed();
+            }
         } else {
             super.onBackPressed();
 
