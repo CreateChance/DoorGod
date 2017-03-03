@@ -3,12 +3,7 @@ package com.createchance.doorgod.lockfragments;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.provider.Settings;
-import android.support.v4.app.Fragment;
-import android.support.v4.hardware.fingerprint.FingerprintManagerCompat;
-import android.support.v4.os.CancellationSignal;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,51 +12,21 @@ import android.widget.TextView;
 
 import com.createchance.doorgod.R;
 import com.createchance.doorgod.database.LockInfo;
-import com.createchance.doorgod.fingerprint.CryptoObjectHelper;
-import com.createchance.doorgod.fingerprint.MyAuthCallback;
+import com.createchance.doorgod.ui.AppListActivity;
 import com.createchance.doorgod.ui.DoorGodActivity;
 import com.createchance.doorgod.util.LogUtil;
-import com.createchance.doorgod.util.MsgUtil;
 import com.eftimoff.patternview.PatternView;
 
 import org.litepal.crud.DataSupport;
 
-public class PatternLockFragment extends Fragment {
+public class PatternLockFragment extends BaseFragment {
 
     private static final String TAG = "PatternLockFragment";
 
-    private FingerprintManagerCompat fingerprintManager;
-    private MyAuthCallback myAuthCallback = null;
-    private CancellationSignal cancellationSignal = null;
-
     private TextView fingerprintInfo;
+    private ImageView fingerprintIcon;
 
     private PatternView patternView;
-
-    private Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-
-            LogUtil.d(TAG, "msg: " + msg.what + " ,arg1: " + msg.arg1);
-            switch (msg.what) {
-                case MsgUtil.MSG_AUTH_SUCCESS:
-                    ((DoorGodActivity)getActivity()).getService().addUnlockedApp();
-                    getActivity().finish();
-                    cancellationSignal = null;
-                    break;
-                case MsgUtil.MSG_AUTH_FAILED:
-                    fingerprintInfo.setText(R.string.fingerprint_auth_failed);
-                    cancellationSignal = null;
-                    break;
-                case MsgUtil.MSG_AUTH_ERROR:
-                    fingerprintInfo.setText(R.string.fingerprint_auth_error);
-                    break;
-                default:
-                    break;
-            }
-        }
-    };
 
     public PatternLockFragment() {
         // Required empty public constructor
@@ -70,14 +35,6 @@ public class PatternLockFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        fingerprintManager = FingerprintManagerCompat.from(getActivity());
-
-        try {
-            myAuthCallback = new MyAuthCallback(mHandler);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
@@ -88,35 +45,8 @@ public class PatternLockFragment extends Fragment {
 
         // If this device has finger print sensor and enrolls one, we will show fingerprint info.
         fingerprintInfo = (TextView) view.findViewById(R.id.fingerprint_hint);
-        ImageView icon = (ImageView) view.findViewById(R.id.fingerprint_icon);
-        if (fingerprintManager.isHardwareDetected()) {
-            fingerprintInfo.setVisibility(View.VISIBLE);
-            if (fingerprintManager.hasEnrolledFingerprints()) {
-                icon.setVisibility(View.VISIBLE);
+        fingerprintIcon = (ImageView) view.findViewById(R.id.fingerprint_icon);
 
-                // start fingerprint auth here.
-                try {
-                    CryptoObjectHelper cryptoObjectHelper = new CryptoObjectHelper();
-                    if (cancellationSignal == null) {
-                        cancellationSignal = new CancellationSignal();
-                    }
-                    fingerprintManager.authenticate(cryptoObjectHelper.buildCryptoObject(), 0,
-                            cancellationSignal, myAuthCallback, null);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    mHandler.obtainMessage(MsgUtil.MSG_AUTH_ERROR).sendToTarget();
-                }
-            } else {
-                fingerprintInfo.setText(R.string.fragment_pattern_view_fingerprint_no_enroll);
-                fingerprintInfo.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent intent = new Intent(Settings.ACTION_SECURITY_SETTINGS);
-                        startActivity(intent);
-                    }
-                });
-            }
-        }
         patternView = (PatternView) view.findViewById(R.id.patternView);
         patternView.setOnPatternDetectedListener(new PatternView.OnPatternDetectedListener() {
             @Override
@@ -124,7 +54,13 @@ public class PatternLockFragment extends Fragment {
                 LogUtil.d(TAG, "pattern detected.");
                 LockInfo lockInfo = DataSupport.findFirst(LockInfo.class);
                 if (patternView.getPatternString().equals(lockInfo.getLockString())) {
-                    ((DoorGodActivity)getActivity()).getService().addUnlockedApp();
+                    if (((DoorGodActivity)getActivity()).isStartByUser()) {
+                        Intent intent = new Intent(getActivity(), AppListActivity.class);
+                        startActivity(intent);
+                    } else {
+                        ((DoorGodActivity) getActivity()).getService().addUnlockedApp();
+                    }
+                    cancelFingerprint();
                     getActivity().finish();
                 } else {
                     patternView.setDisplayMode(PatternView.DisplayMode.Wrong);
@@ -142,7 +78,42 @@ public class PatternLockFragment extends Fragment {
     }
 
     @Override
-    public void onDetach() {
-        super.onDetach();
+    public void noFingerprintHardware() {
+        fingerprintInfo.setVisibility(View.GONE);
+        fingerprintIcon.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void noFingerprintEnrolled() {
+        fingerprintIcon.setVisibility(View.GONE);
+        fingerprintInfo.setText(R.string.fragment_pattern_view_fingerprint_no_enroll);
+        fingerprintInfo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Settings.ACTION_SECURITY_SETTINGS);
+                startActivity(intent);
+            }
+        });
+    }
+
+    @Override
+    public void onFingerprintSuccess() {
+        if (((DoorGodActivity)getActivity()).isStartByUser()) {
+            Intent intent = new Intent(getActivity(), AppListActivity.class);
+            startActivity(intent);
+        } else {
+            ((DoorGodActivity) getActivity()).getService().addUnlockedApp();
+        }
+        getActivity().finish();
+    }
+
+    @Override
+    public void onFingerprintFailed() {
+        fingerprintInfo.setText(R.string.fingerprint_auth_failed);
+    }
+
+    @Override
+    public void onFingerprintError() {
+        fingerprintInfo.setText(R.string.fingerprint_auth_error);
     }
 }

@@ -42,4 +42,6 @@
     <string name="settings_lock_type_pin">PIN码</string>
 
     <string name="first_start_info">这是第一次运行，请设置锁屏方式。</string>
+
+    <string name="no_lock_type_enrolled_warning">你必须指定一个解锁类型！</string>
 </resources>

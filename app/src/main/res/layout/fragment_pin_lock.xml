@@ -29,6 +29,24 @@
         android:textColor="@color/white"
         android:textSize="34sp" />
 
+    <TextView
+        android:id="@+id/fingerprint_hint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_alignParentBottom="true"
+        android:text="@string/fragment_pattern_view_fingerprint"
+        android:textColor="@color/patternViewDot"
+        android:textSize="20sp"/>
+
+    <ImageView
+        android:id="@+id/fingerprint_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_above="@id/fingerprint_hint"
+        android:src="@drawable/ic_fingerprint_white_48dp"/>
+
     <com.andrognito.pinlockview.IndicatorDots
         android:id="@+id/indicator_dots"
         android:layout_width="wrap_content"
