@@ -62,7 +62,8 @@ public class DoorGodActivity extends AppCompatActivity {
         if (intent != null) {
             String action = intent.getAction();
             Set<String> catagory = intent.getCategories();
-            if (action.equals(Intent.ACTION_MAIN) && catagory.contains(Intent.CATEGORY_LAUNCHER)) {
+            if (action != null &&
+                    action.equals(Intent.ACTION_MAIN) && catagory.contains(Intent.CATEGORY_LAUNCHER)) {
                 isLaunchFromHome = true;
             }
         }

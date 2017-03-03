@@ -18,7 +18,9 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".ui.AppListActivity"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:noHistory="true"
+            android:excludeFromRecents="true">
         </activity>
 
         <service

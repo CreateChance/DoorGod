@@ -19,12 +19,9 @@ public abstract class BaseFragment extends Fragment {
     private FingerprintManagerCompat fingerprintManager;
     private MyAuthCallback myAuthCallback = null;
     private CancellationSignal cancellationSignal = null;
-    private boolean isFingerPrintPass = false;
 
     protected boolean noFingerprintEnrolled = false;
     protected boolean noFingerprintDetected = false;
-
-    private boolean isFingerprintWorking = false;
 
     private Handler mHandler = new Handler() {
         @Override
@@ -34,20 +31,17 @@ public abstract class BaseFragment extends Fragment {
             LogUtil.d(TAG, "msg: " + msg.what + " ,arg1: " + msg.arg1);
             switch (msg.what) {
                 case MsgUtil.MSG_AUTH_SUCCESS:
-                    LogUtil.d(TAG, "is canceled: " + cancellationSignal.isCanceled());
-                    isFingerPrintPass = true;
                     onFingerprintSuccess();
-                    cancellationSignal = null;
                     break;
                 case MsgUtil.MSG_AUTH_FAILED:
                     onFingerprintFailed();
-                    cancellationSignal = null;
                     break;
                 case MsgUtil.MSG_AUTH_ERROR:
                     onFingerprintError();
                     if (cancellationSignal.isCanceled()) {
                         getActivity().finish();
                     }
+                    cancellationSignal = null;
                     break;
                 default:
                     break;
@@ -79,7 +73,6 @@ public abstract class BaseFragment extends Fragment {
                     LogUtil.d(TAG, "Now we start listen for finger print auth.");
                     fingerprintManager.authenticate(cryptoObjectHelper.buildCryptoObject(), 0,
                             cancellationSignal, myAuthCallback, null);
-                    isFingerprintWorking = true;
                 } catch (Exception e) {
                     e.printStackTrace();
                     mHandler.obtainMessage(MsgUtil.MSG_AUTH_ERROR).sendToTarget();
@@ -93,8 +86,7 @@ public abstract class BaseFragment extends Fragment {
     }
 
     public void cancelFingerprint() {
-        if (!isFingerPrintPass && cancellationSignal != null) {
-            LogUtil.d(TAG, "cancel finger print.#############################");
+        if (cancellationSignal != null) {
             // cancel fingerprint auth here.
             cancellationSignal.cancel();
         }
@@ -107,6 +99,6 @@ public abstract class BaseFragment extends Fragment {
     public abstract void onFingerprintError();
 
     public boolean isFingerprintWorking() {
-        return isFingerprintWorking;
+        return cancellationSignal != null;
     }
 }
