@@ -188,6 +188,11 @@ public class DoorGodService extends Service {
 
         Set<String> packageNameSet = new HashSet<>();
         for (ResolveInfo info : homeApps) {
+            // skip ourselves
+            if (info.activityInfo.packageName.equals(getPackageName())) {
+                continue;
+            }
+
             if (!packageNameSet.contains(info.activityInfo.packageName)) {
                 packageNameSet.add(info.activityInfo.packageName);
                 AppInfo appInfo = new AppInfo();
