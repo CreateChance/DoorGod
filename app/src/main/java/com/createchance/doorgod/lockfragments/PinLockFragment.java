@@ -94,7 +94,6 @@ public class PinLockFragment extends BaseFragment {
         return view;
     }
 
-    @Override
     public void onFingerprintSuccess() {
         if (((DoorGodActivity)getActivity()).isStartByUser()) {
             Intent intent = new Intent(getActivity(), AppListActivity.class);
