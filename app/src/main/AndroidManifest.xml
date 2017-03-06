@@ -19,7 +19,6 @@
         <activity
             android:name=".ui.AppListActivity"
             android:screenOrientation="portrait"
-            android:noHistory="true"
             android:excludeFromRecents="true">
         </activity>
 

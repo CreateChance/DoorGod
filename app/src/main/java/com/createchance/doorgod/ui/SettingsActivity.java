@@ -6,10 +6,12 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.IBinder;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.createchance.doorgod.R;
@@ -47,6 +49,11 @@ public class SettingsActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         setTitle(R.string.menu_title_settings);
 
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+
         // bind to service.
         Intent intent = new Intent(this, DoorGodService.class);
         bindService(intent, mConnection, BIND_AUTO_CREATE);
@@ -65,6 +72,7 @@ public class SettingsActivity extends AppCompatActivity {
                     SharedPreferences.Editor editor = mPrefs.edit();
                     editor.putBoolean(LOCK_ENROLLED, true);
                     editor.commit();
+                    finish();
                 }
                 break;
         }
@@ -75,6 +83,19 @@ public class SettingsActivity extends AppCompatActivity {
         super.onDestroy();
 
         unbindService(mConnection);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                this.finish();
+                break;
+            default:
+                break;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     public void OnClick(View view) {
