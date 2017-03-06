@@ -65,7 +65,6 @@ public class SettingsActivity extends AppCompatActivity {
                     SharedPreferences.Editor editor = mPrefs.edit();
                     editor.putBoolean(LOCK_ENROLLED, true);
                     editor.commit();
-                    finish();
                 }
                 break;
         }
