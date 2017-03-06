@@ -12,13 +12,22 @@ import android.content.pm.ResolveInfo;
 import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.support.v4.hardware.fingerprint.FingerprintManagerCompat;
+import android.support.v4.os.CancellationSignal;
 
 import com.createchance.doorgod.adapter.AppInfo;
 import com.createchance.doorgod.database.LockInfo;
 import com.createchance.doorgod.database.ProtectedApplication;
+import com.createchance.doorgod.fingerprint.CryptoObjectHelper;
+import com.createchance.doorgod.fingerprint.MyAuthCallback;
 import com.createchance.doorgod.ui.DoorGodActivity;
+import com.createchance.doorgod.util.FingerprintAuthRequest;
+import com.createchance.doorgod.util.FingerprintAuthResponse;
 import com.createchance.doorgod.util.LogUtil;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.litepal.crud.DataSupport;
 import org.litepal.tablemanager.Connector;
 
@@ -54,18 +63,34 @@ public class DoorGodService extends Service {
 
     private int lockType = -1;
 
+    private FingerprintManagerCompat fingerprintManager;
+    private MyAuthCallback myAuthCallback = null;
+    private CancellationSignal cancellationSignal = null;
+
+    protected boolean fingerprintEnrolled = false;
+    protected boolean fingerprintDetected = false;
+
+    private boolean isScreenOn = true;
+
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
 
+            LogUtil.d(TAG, "action: " + action);
             if (action.equals(Intent.ACTION_SCREEN_OFF)) {
                 mUnlockedAppList.clear();
 
+                isScreenOn = false;
+
+                /*
                 // we go to home screen now.
                 Intent i = new Intent(Intent.ACTION_MAIN);
                 i.addCategory(Intent.CATEGORY_HOME);
                 startActivity(i);
+                */
+            } else if (action.equals(Intent.ACTION_SCREEN_ON)) {
+                isScreenOn = true;
             }
         }
     };
@@ -132,6 +157,25 @@ public class DoorGodService extends Service {
             return lockType;
         }
 
+        public void startFingerprintAuth() {
+            EventBus.getDefault().post(new FingerprintAuthRequest());
+        }
+
+        public boolean hasFingerprintHardware() {
+            return fingerprintDetected;
+        }
+
+        public boolean isFingerprintEnrolled() {
+            return fingerprintEnrolled;
+        }
+
+        public void cancelFingerprint() {
+            if (cancellationSignal != null) {
+                // cancel fingerprint auth here.
+                cancellationSignal.cancel();
+            }
+        }
+
         private void removeAllProtectedApp() {
             DataSupport.deleteAll(ProtectedApplication.class);
         }
@@ -140,6 +184,24 @@ public class DoorGodService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        // register event bus.
+        EventBus.getDefault().register(this);
+
+        fingerprintManager = FingerprintManagerCompat.from(this);
+
+        try {
+            myAuthCallback = new MyAuthCallback();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (fingerprintManager.isHardwareDetected()) {
+            fingerprintDetected = true;
+            if (fingerprintManager.hasEnrolledFingerprints()) {
+                fingerprintEnrolled = true;
+            }
+        }
 
         mPm = getPackageManager();
 
@@ -158,6 +220,7 @@ public class DoorGodService extends Service {
 
         // register screen state listener.
         IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
+        filter.addAction(Intent.ACTION_SCREEN_ON);
         registerReceiver(mReceiver, filter);
     }
 
@@ -177,8 +240,33 @@ public class DoorGodService extends Service {
     public void onDestroy() {
         super.onDestroy();
 
+        // unregister event bus.
+        EventBus.getDefault().unregister(this);
+
         unregisterReceiver(mReceiver);
         LogUtil.e(TAG, "Service died, so no apps can be protected!");
+    }
+
+    /*
+     * Fingerprint auth handle function.
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onFingerprintAuth(FingerprintAuthRequest req) {
+        // start fingerprint auth here.
+        if (fingerprintDetected && fingerprintEnrolled) {
+            try {
+                CryptoObjectHelper cryptoObjectHelper = new CryptoObjectHelper();
+                cancellationSignal = new CancellationSignal();
+                LogUtil.d(TAG, "Now we start listen for finger print auth.");
+                fingerprintManager.authenticate(cryptoObjectHelper.buildCryptoObject(), 0,
+                        cancellationSignal, myAuthCallback, null);
+            } catch (Exception e) {
+                e.printStackTrace();
+                // send this error.
+                EventBus.getDefault().
+                        post(new FingerprintAuthResponse(FingerprintAuthResponse.MSG_AUTH_ERROR));
+            }
+        }
     }
 
     private void initAppList() {
@@ -214,19 +302,20 @@ public class DoorGodService extends Service {
         List<UsageStats> usageStatsList = mUsageStatsManager.
                 queryUsageStats(UsageStatsManager.INTERVAL_BEST, time - 2000, time);
 
-        if (usageStatsList != null && !usageStatsList.isEmpty()) {
+        if (usageStatsList != null && !usageStatsList.isEmpty() && isScreenOn) {
             SortedMap<Long, UsageStats> usageStatsMap = new TreeMap<>();
             for (UsageStats usageStats : usageStatsList) {
                 usageStatsMap.put(usageStats.getLastTimeUsed(), usageStats);
             }
             if (!usageStatsMap.isEmpty()) {
                 String topPackageName = usageStatsMap.get(usageStatsMap.lastKey()).getPackageName();
-                LogUtil.d(TAG, "starting: " + topPackageName);
                 if (mProtectedAppList.contains(topPackageName)
                         && !mUnlockedAppList.contains(topPackageName)) {
+                    LogUtil.d(TAG, "protecting: " + topPackageName);
                     Intent intent = new Intent(DoorGodService.this, DoorGodActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
+                            Intent.FLAG_ACTIVITY_NO_HISTORY |
+                            Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
                     DoorGodService.this.startActivity(intent);
                     currentLockedApp = topPackageName;
                 }

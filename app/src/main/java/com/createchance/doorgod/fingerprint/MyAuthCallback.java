@@ -1,56 +1,50 @@
 package com.createchance.doorgod.fingerprint;
 
-import android.os.Handler;
 import android.support.v4.hardware.fingerprint.FingerprintManagerCompat;
 
-import com.createchance.doorgod.util.MsgUtil;
+import com.createchance.doorgod.util.FingerprintAuthResponse;
+
+import org.greenrobot.eventbus.EventBus;
 
 /**
  * Fingerprint auth result callback.
  */
 public class MyAuthCallback extends FingerprintManagerCompat.AuthenticationCallback {
 
-    private Handler handler = null;
-
-    public MyAuthCallback(Handler handler) {
+    public MyAuthCallback() {
         super();
-
-        this.handler = handler;
     }
 
     @Override
     public void onAuthenticationError(int errMsgId, CharSequence errString) {
         super.onAuthenticationError(errMsgId, errString);
 
-        if (handler != null) {
-            handler.obtainMessage(MsgUtil.MSG_AUTH_ERROR).sendToTarget();
-        }
+        EventBus.getDefault().
+                post(new FingerprintAuthResponse(FingerprintAuthResponse.MSG_AUTH_ERROR));
     }
 
     @Override
     public void onAuthenticationHelp(int helpMsgId, CharSequence helpString) {
         super.onAuthenticationHelp(helpMsgId, helpString);
 
-        if (handler != null) {
-            handler.obtainMessage(MsgUtil.MSG_AUTH_HELP).sendToTarget();
-        }
+        // do nothing for now.
+        EventBus.getDefault().
+                post(new FingerprintAuthResponse(FingerprintAuthResponse.MSG_AUTH_HELP));
     }
 
     @Override
     public void onAuthenticationSucceeded(FingerprintManagerCompat.AuthenticationResult result) {
         super.onAuthenticationSucceeded(result);
 
-        if (handler != null) {
-            handler.obtainMessage(MsgUtil.MSG_AUTH_SUCCESS).sendToTarget();
-        }
+        EventBus.getDefault().
+                post(new FingerprintAuthResponse(FingerprintAuthResponse.MSG_AUTH_SUCCESS));
     }
 
     @Override
     public void onAuthenticationFailed() {
         super.onAuthenticationFailed();
 
-        if (handler != null) {
-            handler.obtainMessage(MsgUtil.MSG_AUTH_FAILED).sendToTarget();
-        }
+        EventBus.getDefault().
+                post(new FingerprintAuthResponse(FingerprintAuthResponse.MSG_AUTH_FAILED));
     }
 }

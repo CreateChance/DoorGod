@@ -12,7 +12,6 @@ import android.os.Bundle;
 import android.widget.Toast;
 
 import com.createchance.doorgod.R;
-import com.createchance.doorgod.lockfragments.BaseFragment;
 import com.createchance.doorgod.lockfragments.PatternLockFragment;
 import com.createchance.doorgod.lockfragments.PinLockFragment;
 import com.createchance.doorgod.service.DoorGodService;
@@ -27,8 +26,6 @@ public class DoorGodActivity extends AppCompatActivity {
 
     private boolean isLaunchFromHome = false;
 
-    private BaseFragment fragment;
-
     private SharedPreferences mPrefs;
     private static final String LOCK_ENROLL_STATUS = "com.createchance.doorgod.LOCK_ENROLL_STATUS";
     private static final String LOCK_ENROLLED = "ENROLLED";
@@ -38,6 +35,8 @@ public class DoorGodActivity extends AppCompatActivity {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             mService = (DoorGodService.ServiceBinder) service;
+
+            mService.startFingerprintAuth();
 
             if (mService.getLockType() > 0) {
                 addFragment(mService.getLockType());
@@ -87,6 +86,24 @@ public class DoorGodActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (mService != null) {
+            mService.startFingerprintAuth();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        if (mService != null) {
+            mService.cancelFingerprint();
+        }
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
@@ -108,15 +125,9 @@ public class DoorGodActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if (isLaunchFromHome) {
-            if (fragment.isFingerprintWorking()) {
-                fragment.cancelFingerprint();
-            } else {
-                super.onBackPressed();
-            }
-        } else {
-            super.onBackPressed();
+        super.onBackPressed();
 
+        if (!isLaunchFromHome) {
             Intent i = new Intent(Intent.ACTION_MAIN);
             i.addCategory(Intent.CATEGORY_HOME);
             startActivity(i);
@@ -127,21 +138,21 @@ public class DoorGodActivity extends AppCompatActivity {
         return mService;
     }
 
-    public boolean isStartByUser() {
+    public boolean isLaunchFromHome() {
         return isLaunchFromHome;
     }
 
     private void addFragment(int type) {
-        LogUtil.d(TAG, "type: " + type);
+        LogUtil.d(TAG, "Lock type: " + type);
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         if (type == LockTypeUtil.TYPE_PIN) {
-            fragment = new PinLockFragment();
+            transaction.add(R.id.lock_fragment_container, new PinLockFragment());
         } else if (type == LockTypeUtil.TYPE_PATTERN) {
-            fragment = new PatternLockFragment();
+            transaction.add(R.id.lock_fragment_container, new PatternLockFragment());
         }
-        transaction.add(R.id.lock_fragment_container, fragment);
+
         transaction.commit();
     }
 

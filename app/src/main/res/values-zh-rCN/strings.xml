@@ -32,7 +32,7 @@
     <string name="pattern_lock_enroll_info_mismatch">两次输入不匹配，请重试！</string>
     <string name="pattern_lock_enroll_toast_empty">图案不能是空</string>
 
-    <string name="pin_lock_enroll_step1_info">输入4位数字</string>
+    <string name="pin_lock_enroll_step1_info">输入PIN码</string>
     <string name="pin_lock_enroll_step2_info">再次输入</string>
     <string name="pin_lock_enroll_info_mismatch">两次密码不匹配，请重试！</string>
     <string name="pin_lock_enroll_toast_empty">密码不能是空</string>
