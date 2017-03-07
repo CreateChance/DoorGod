@@ -31,6 +31,10 @@ import com.createchance.doorgod.R;
 import com.createchance.doorgod.adapter.AppAdapter;
 import com.createchance.doorgod.adapter.AppInfo;
 import com.createchance.doorgod.service.DoorGodService;
+import com.createchance.doorgod.util.AppListForegroundEvent;
+import com.createchance.doorgod.util.LogUtil;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.List;
 
@@ -153,10 +157,10 @@ public class AppListActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
+    protected void onResume() {
+        super.onResume();
 
-
+        EventBus.getDefault().post(new AppListForegroundEvent());
     }
 
     @Override

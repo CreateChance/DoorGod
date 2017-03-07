@@ -21,6 +21,7 @@ import com.createchance.doorgod.database.ProtectedApplication;
 import com.createchance.doorgod.fingerprint.CryptoObjectHelper;
 import com.createchance.doorgod.fingerprint.MyAuthCallback;
 import com.createchance.doorgod.ui.DoorGodActivity;
+import com.createchance.doorgod.util.AppListForegroundEvent;
 import com.createchance.doorgod.util.FingerprintAuthRequest;
 import com.createchance.doorgod.util.FingerprintAuthResponse;
 import com.createchance.doorgod.util.LogUtil;
@@ -67,6 +68,8 @@ public class DoorGodService extends Service {
     private MyAuthCallback myAuthCallback = null;
     private CancellationSignal cancellationSignal = null;
 
+    private boolean isAppListInForeground = false;
+
     private boolean isScreenOn = true;
 
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
@@ -79,6 +82,14 @@ public class DoorGodService extends Service {
                 mUnlockedAppList.clear();
 
                 isScreenOn = false;
+
+                if (isAppListInForeground) {
+                    isAppListInForeground = false;
+                    Intent i = new Intent(Intent.ACTION_MAIN);
+                    i.addCategory(Intent.CATEGORY_HOME);
+                    startActivity(i);
+                }
+
             } else if (action.equals(Intent.ACTION_SCREEN_ON)) {
                 isScreenOn = true;
             }
@@ -260,6 +271,14 @@ public class DoorGodService extends Service {
                         post(new FingerprintAuthResponse(FingerprintAuthResponse.MSG_AUTH_ERROR));
             }
         }
+    }
+
+    /*
+     * App list activity is foreground handle.
+     */
+    @Subscribe(threadMode = ThreadMode.BACKGROUND)
+    public void onAppListForeground(AppListForegroundEvent event) {
+        isAppListInForeground = true;
     }
 
     private void initAppList() {
