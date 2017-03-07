@@ -1,5 +1,7 @@
 package com.createchance.doorgod.service;
 
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
@@ -9,12 +11,15 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.graphics.BitmapFactory;
 import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.hardware.fingerprint.FingerprintManagerCompat;
 import android.support.v4.os.CancellationSignal;
 
+import com.createchance.doorgod.R;
 import com.createchance.doorgod.adapter.AppInfo;
 import com.createchance.doorgod.database.LockInfo;
 import com.createchance.doorgod.database.ProtectedApplication;
@@ -224,6 +229,8 @@ public class DoorGodService extends Service {
         IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
         filter.addAction(Intent.ACTION_SCREEN_ON);
         registerReceiver(mReceiver, filter);
+
+        makeForeground();
     }
 
     @Override
@@ -278,7 +285,14 @@ public class DoorGodService extends Service {
      */
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onAppListForeground(AppListForegroundEvent event) {
-        isAppListInForeground = true;
+        if (event.isForeground()) {
+            isAppListInForeground = true;
+            // We quit foreground cause we have foreground activity now.
+            stopForeground(true);
+        } else {
+            // we have to make us foreground now.
+            makeForeground();
+        }
     }
 
     private void initAppList() {
@@ -349,5 +363,20 @@ public class DoorGodService extends Service {
                 }
             }
         }
+    }
+
+    private void makeForeground() {
+        // start this service in foreground
+        Intent intent = new Intent(this, DoorGodActivity.class);
+        intent.setAction(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_LAUNCHER);
+        PendingIntent pi = PendingIntent.getActivity(this, 0, intent, 0);
+        Notification notification = new NotificationCompat.Builder(this)
+                .setContentTitle(getString(R.string.service_foreground_notification_title))
+                .setSmallIcon(R.drawable.ic_lock_white_48dp)
+                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher))
+                .setContentIntent(pi)
+                .build();
+        startForeground(1, notification);
     }
 }

@@ -49,4 +49,6 @@
     <string name="first_start_info">这是第一次运行，请设置锁屏方式。</string>
 
     <string name="no_lock_type_enrolled_warning">你必须指定一个解锁类型！</string>
+
+    <string name="service_foreground_notification_title">门神正在保护您的应用。</string>
 </resources>

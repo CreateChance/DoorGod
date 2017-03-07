@@ -24,7 +24,7 @@ public class DoorGodActivity extends AppCompatActivity {
 
     private static final String TAG = "DoorGodActivity";
 
-    private boolean isLaunchFromHome = false;
+    private boolean isLaunchByUser = false;
 
     private SharedPreferences mPrefs;
     private static final String LOCK_ENROLL_STATUS = "com.createchance.doorgod.LOCK_ENROLL_STATUS";
@@ -63,7 +63,7 @@ public class DoorGodActivity extends AppCompatActivity {
             Set<String> catagory = intent.getCategories();
             if (action != null &&
                     action.equals(Intent.ACTION_MAIN) && catagory.contains(Intent.CATEGORY_LAUNCHER)) {
-                isLaunchFromHome = true;
+                isLaunchByUser = true;
             }
         }
 
@@ -78,10 +78,9 @@ public class DoorGodActivity extends AppCompatActivity {
         super.onStart();
 
         if (!isLockEnrolled()) {
-            Toast.makeText(DoorGodActivity.this,
-                    R.string.first_start_info, Toast.LENGTH_LONG).show();
-            Intent intent = new Intent(DoorGodActivity.this, SettingsActivity.class);
-            startActivityForResult(intent, 100);
+            Intent intent = new Intent(DoorGodActivity.this, AppListActivity.class);
+            startActivity(intent);
+            finish();
         }
     }
 
@@ -118,6 +117,7 @@ public class DoorGodActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        LogUtil.d(TAG, "onDestroy");
         super.onDestroy();
 
         unbindService(mConnection);
@@ -127,7 +127,7 @@ public class DoorGodActivity extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
 
-        if (!isLaunchFromHome) {
+        if (!isLaunchByUser) {
             Intent i = new Intent(Intent.ACTION_MAIN);
             i.addCategory(Intent.CATEGORY_HOME);
             startActivity(i);
@@ -139,7 +139,7 @@ public class DoorGodActivity extends AppCompatActivity {
     }
 
     public boolean isLaunchFromHome() {
-        return isLaunchFromHome;
+        return isLaunchByUser;
     }
 
     private void addFragment(int type) {

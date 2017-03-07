@@ -52,4 +52,6 @@
 
     <string name="no_lock_type_enrolled_warning">You MUST set one lock!</string>
 
+    <string name="service_foreground_notification_title">DoorGod is protecting your apps.</string>
+
 </resources>

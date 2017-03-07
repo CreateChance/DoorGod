@@ -19,27 +19,36 @@
         <activity
             android:name=".ui.AppListActivity"
             android:screenOrientation="portrait"
+            android:exported="false"
             android:excludeFromRecents="true">
         </activity>
 
         <service
             android:name=".service.DoorGodService"
             android:enabled="true"
-            android:exported="true" />
+            android:exported="false" />
 
         <activity
             android:name=".ui.DoorGodActivity"
             android:launchMode="singleInstance"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:noHistory="true"
+            android:excludeFromRecents="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.EnrollPatternActivity" />
-        <activity android:name=".ui.EnrollPinActivity" />
-        <activity android:name=".ui.SettingsActivity"></activity>
+        <activity android:name=".ui.EnrollPatternActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"/>
+        <activity android:name=".ui.EnrollPinActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"/>
+        <activity android:name=".ui.SettingsActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"/>
     </application>
 
 </manifest>

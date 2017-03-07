@@ -43,6 +43,7 @@ public class AppListActivity extends AppCompatActivity {
     private static final String TAG = "AppListActivity";
 
     public static final int CODE_REQUEST_PERMISSION = 100;
+    public static final int CODE_START_SETTINGS = 101;
 
     private DrawerLayout drawerLayout;
 
@@ -57,6 +58,10 @@ public class AppListActivity extends AppCompatActivity {
     private HomeKeyWatcher mHomeKeyWatcher;
 
     private DoorGodService.ServiceBinder mService;
+
+    private SharedPreferences mPrefs;
+    private static final String LOCK_ENROLL_STATUS = "com.createchance.doorgod.LOCK_ENROLL_STATUS";
+    private static final String LOCK_ENROLLED = "ENROLLED";
 
     private ServiceConnection mConnection = new ServiceConnection() {
         @Override
@@ -85,6 +90,10 @@ public class AppListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+        // get prefs
+        mPrefs = getSharedPreferences(LOCK_ENROLL_STATUS, MODE_PRIVATE);
 
         // bind to service
         Intent intent = new Intent(AppListActivity.this, DoorGodService.class);
@@ -157,10 +166,31 @@ public class AppListActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+
+        if (!isLockEnrolled()) {
+            Toast.makeText(AppListActivity.this,
+                    R.string.first_start_info, Toast.LENGTH_LONG).show();
+            Intent intent = new Intent(AppListActivity.this, SettingsActivity.class);
+            startActivityForResult(intent, CODE_START_SETTINGS);
+        }
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
 
-        EventBus.getDefault().post(new AppListForegroundEvent());
+        EventBus.getDefault().post(new AppListForegroundEvent(true));
+    }
+
+    @Override
+    protected void onStop() {
+        LogUtil.d(TAG, "onStop");
+
+        super.onStop();
+
+        EventBus.getDefault().post(new AppListForegroundEvent(false));
     }
 
     @Override
@@ -178,6 +208,8 @@ public class AppListActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        LogUtil.d(TAG, "onDestroy");
+
         super.onDestroy();
 
         unbindService(mConnection);
@@ -194,6 +226,11 @@ public class AppListActivity extends AppCompatActivity {
                 if (!checkIfGetPermission()) {
                     Toast.makeText(AppListActivity.this,
                             R.string.toast_info_request_permission_failed, Toast.LENGTH_SHORT).show();
+                }
+                break;
+            case CODE_START_SETTINGS:
+                if (!isLockEnrolled()) {
+                    finish();
                 }
                 break;
             default:
@@ -264,5 +301,9 @@ public class AppListActivity extends AppCompatActivity {
         int mode = appOps.checkOpNoThrow("android:get_usage_stats",
                 android.os.Process.myUid(), this.getPackageName());
         return (mode == AppOpsManager.MODE_ALLOWED);
+    }
+
+    private boolean isLockEnrolled() {
+        return mPrefs.getBoolean(LOCK_ENROLLED, false);
     }
 }
