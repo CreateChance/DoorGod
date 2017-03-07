@@ -114,6 +114,27 @@ public class PinLockFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+
+        LogUtil.d(TAG, "onResume");
+        if (!mService.hasFingerprintHardware()) {
+            fingerprintInfo.setVisibility(View.GONE);
+            fingerprintIcon.setVisibility(View.GONE);
+        } else if (!mService.isFingerprintEnrolled()) {
+            fingerprintIcon.setVisibility(View.GONE);
+            fingerprintInfo.setText(R.string.fragment_pattern_view_fingerprint_no_enroll);
+            fingerprintInfo.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(Settings.ACTION_SECURITY_SETTINGS);
+                    startActivity(intent);
+                }
+            });
+        }
+    }
+
+    @Override
     public void onDestroyView() {
         super.onDestroyView();
 

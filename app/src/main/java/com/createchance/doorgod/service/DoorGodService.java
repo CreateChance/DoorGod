@@ -63,12 +63,9 @@ public class DoorGodService extends Service {
 
     private int lockType = -1;
 
-    private FingerprintManagerCompat fingerprintManager;
+    //private FingerprintManagerCompat fingerprintManager;
     private MyAuthCallback myAuthCallback = null;
     private CancellationSignal cancellationSignal = null;
-
-    protected boolean fingerprintEnrolled = false;
-    protected boolean fingerprintDetected = false;
 
     private boolean isScreenOn = true;
 
@@ -82,13 +79,6 @@ public class DoorGodService extends Service {
                 mUnlockedAppList.clear();
 
                 isScreenOn = false;
-
-                /*
-                // we go to home screen now.
-                Intent i = new Intent(Intent.ACTION_MAIN);
-                i.addCategory(Intent.CATEGORY_HOME);
-                startActivity(i);
-                */
             } else if (action.equals(Intent.ACTION_SCREEN_ON)) {
                 isScreenOn = true;
             }
@@ -162,14 +152,24 @@ public class DoorGodService extends Service {
         }
 
         public boolean hasFingerprintHardware() {
-            return fingerprintDetected;
+            boolean detected = FingerprintManagerCompat.from(DoorGodService.this).isHardwareDetected();
+
+            LogUtil.d(TAG, "hasFingerprintHardware: " + detected);
+
+            return detected;
         }
 
         public boolean isFingerprintEnrolled() {
-            return fingerprintEnrolled;
+            boolean enrolled = FingerprintManagerCompat.from(DoorGodService.this).hasEnrolledFingerprints();
+
+            LogUtil.d(TAG, "isFingerprintEnrolled: " + enrolled);
+
+            return enrolled
+                    ;
         }
 
         public void cancelFingerprint() {
+            LogUtil.d(TAG, "Request for canceling fingerprint auth.");
             if (cancellationSignal != null) {
                 // cancel fingerprint auth here.
                 cancellationSignal.cancel();
@@ -188,19 +188,10 @@ public class DoorGodService extends Service {
         // register event bus.
         EventBus.getDefault().register(this);
 
-        fingerprintManager = FingerprintManagerCompat.from(this);
-
         try {
             myAuthCallback = new MyAuthCallback();
         } catch (Exception e) {
             e.printStackTrace();
-        }
-
-        if (fingerprintManager.isHardwareDetected()) {
-            fingerprintDetected = true;
-            if (fingerprintManager.hasEnrolledFingerprints()) {
-                fingerprintEnrolled = true;
-            }
         }
 
         mPm = getPackageManager();
@@ -253,14 +244,16 @@ public class DoorGodService extends Service {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onFingerprintAuth(FingerprintAuthRequest req) {
         // start fingerprint auth here.
-        if (fingerprintDetected && fingerprintEnrolled) {
+        FingerprintManagerCompat manager = FingerprintManagerCompat.from(DoorGodService.this);
+        if (manager.isHardwareDetected() && manager.hasEnrolledFingerprints()) {
             try {
                 CryptoObjectHelper cryptoObjectHelper = new CryptoObjectHelper();
                 cancellationSignal = new CancellationSignal();
                 LogUtil.d(TAG, "Now we start listen for finger print auth.");
-                fingerprintManager.authenticate(cryptoObjectHelper.buildCryptoObject(), 0,
+                manager.authenticate(cryptoObjectHelper.buildCryptoObject(), 0,
                         cancellationSignal, myAuthCallback, null);
             } catch (Exception e) {
+                LogUtil.d(TAG, "Fingerprint exception happens.");
                 e.printStackTrace();
                 // send this error.
                 EventBus.getDefault().

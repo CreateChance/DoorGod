@@ -27,7 +27,6 @@ public class MyAuthCallback extends FingerprintManagerCompat.AuthenticationCallb
     public void onAuthenticationHelp(int helpMsgId, CharSequence helpString) {
         super.onAuthenticationHelp(helpMsgId, helpString);
 
-        // do nothing for now.
         EventBus.getDefault().
                 post(new FingerprintAuthResponse(FingerprintAuthResponse.MSG_AUTH_HELP));
     }

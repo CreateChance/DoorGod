@@ -56,21 +56,6 @@ public class PatternLockFragment extends Fragment {
         fingerprintInfo = (TextView) view.findViewById(R.id.fingerprint_hint);
         fingerprintIcon = (ImageView) view.findViewById(R.id.fingerprint_icon);
 
-        if (!mService.hasFingerprintHardware()) {
-            fingerprintInfo.setVisibility(View.GONE);
-            fingerprintIcon.setVisibility(View.GONE);
-        } else if (!mService.isFingerprintEnrolled()) {
-            fingerprintIcon.setVisibility(View.GONE);
-            fingerprintInfo.setText(R.string.fragment_pattern_view_fingerprint_no_enroll);
-            fingerprintInfo.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(Settings.ACTION_SECURITY_SETTINGS);
-                    startActivity(intent);
-                }
-            });
-        }
-
         patternView = (PatternView) view.findViewById(R.id.patternView);
         patternView.setOnPatternDetectedListener(new PatternView.OnPatternDetectedListener() {
             @Override
@@ -94,6 +79,34 @@ public class PatternLockFragment extends Fragment {
         });
 
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        LogUtil.d(TAG, "onResume");
+        if (!mService.hasFingerprintHardware()) {
+            LogUtil.v(TAG, "No fingerprint hardware.");
+            fingerprintInfo.setVisibility(View.GONE);
+            fingerprintIcon.setVisibility(View.GONE);
+        } else if (!mService.isFingerprintEnrolled()) {
+            LogUtil.v(TAG, "No fingerprint enrolled.");
+            fingerprintIcon.setVisibility(View.GONE);
+            fingerprintInfo.setText(R.string.fragment_pattern_view_fingerprint_no_enroll);
+            fingerprintInfo.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(Settings.ACTION_SECURITY_SETTINGS);
+                    startActivity(intent);
+                }
+            });
+        } else {
+            LogUtil.v(TAG, "Find hardware and enrolled.");
+            fingerprintIcon.setVisibility(View.VISIBLE);
+            fingerprintInfo.setText(R.string.fragment_pattern_view_fingerprint);
+            fingerprintInfo.setOnClickListener(null);
+        }
     }
 
     @Override
