@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.andrognito.pinlockview.IndicatorDots;
 import com.andrognito.pinlockview.PinLockListener;
@@ -57,7 +58,9 @@ public class PinLockFragment extends Fragment {
                 mService.cancelFingerprint();
                 getActivity().finish();
             } else {
-                LogUtil.d(TAG, "auth failed: " + pinLockInfo.getLockString());
+                LogUtil.d(TAG, "auth failed!");
+                Toast.makeText(getActivity(),
+                        R.string.fragment_pin_lock_view_pin_error, Toast.LENGTH_SHORT).show();
                 indicatorDots.setPinLength(0);
                 pinLockView.resetPinLockView();
             }

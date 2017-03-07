@@ -25,6 +25,7 @@
     <string name="fragment_pattern_view_pattern_error">Pattern error</string>
 
     <string name="fragment_pin_lock_view_title">Input PIN code</string>
+    <string name="fragment_pin_lock_view_pin_error">PIN error</string>
 
     <string name="fingerprint_auth_failed">Fingerprint Auth failed</string>
     <string name="fingerprint_auth_error">Fingerprint Auth error</string>

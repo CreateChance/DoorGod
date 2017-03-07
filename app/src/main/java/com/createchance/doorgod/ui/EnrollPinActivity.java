@@ -13,12 +13,9 @@ import com.andrognito.pinlockview.IndicatorDots;
 import com.andrognito.pinlockview.PinLockListener;
 import com.andrognito.pinlockview.PinLockView;
 import com.createchance.doorgod.R;
-import com.createchance.doorgod.database.LockInfo;
 import com.createchance.doorgod.service.DoorGodService;
 import com.createchance.doorgod.util.LockTypeUtil;
 import com.createchance.doorgod.util.LogUtil;
-
-import java.util.concurrent.locks.Lock;
 
 public class EnrollPinActivity extends AppCompatActivity {
 
@@ -62,6 +59,8 @@ public class EnrollPinActivity extends AppCompatActivity {
                     Toast.makeText(EnrollPinActivity.this,
                             R.string.pin_lock_enroll_info_mismatch, Toast.LENGTH_LONG).show();
                     indicatorDots.setPinLength(0);
+                    pinLockView.resetPinLockView();
+                    isPinConfirm = false;
                     pinLockInfo.setText(R.string.pin_lock_enroll_step1_info);
                 }
             } else {

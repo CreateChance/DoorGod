@@ -30,6 +30,7 @@
     <string name="fragment_pattern_view_pattern_error">图案错误</string>
 
     <string name="fragment_pin_lock_view_title">请输入密码</string>
+    <string name="fragment_pin_lock_view_pin_error">PIN码错误</string>
 
     <string name="fingerprint_auth_failed">指纹认证失败</string>
     <string name="fingerprint_auth_error">指纹认证错误</string>
