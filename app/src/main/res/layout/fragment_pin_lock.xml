@@ -9,8 +9,8 @@
 
     <ImageView
         android:id="@+id/pin_lock_icon"
-        android:layout_width="84dp"
-        android:layout_height="84dp"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="60dp"
         android:src="@drawable/ic_lock_white_48dp" />
@@ -27,7 +27,7 @@
         android:maxLines="1"
         android:text="@string/fragment_pin_lock_view_title"
         android:textColor="@color/white"
-        android:textSize="34sp" />
+        android:textSize="25sp" />
 
     <TextView
         android:id="@+id/fingerprint_hint"
@@ -35,8 +35,9 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:layout_alignParentBottom="true"
+        android:fontFamily="sans-serif-thin"
         android:text="@string/fragment_pattern_view_fingerprint"
-        android:textColor="@color/patternViewDot"
+        android:textColor="@color/white"
         android:textSize="20sp"/>
 
     <ImageView

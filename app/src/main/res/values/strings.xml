@@ -31,13 +31,10 @@
     <string name="fingerprint_auth_error">Fingerprint Auth error</string>
 
     <string name="lock_enroll_btn_cancel">Cancel</string>
-    <string name="lock_enroll_btn_step1">Next</string>
-    <string name="lock_enroll_btn_step2">OK</string>
 
     <string name="pattern_lock_enroll_step1_info">Please draw a pattern</string>
     <string name="pattern_lock_enroll_step2_info">Please draw a pattern again</string>
     <string name="pattern_lock_enroll_info_mismatch">Two pattern mismatch.Try again!</string>
-    <string name="pattern_lock_enroll_toast_empty">Pattern can not be empty.</string>
 
     <string name="pin_lock_enroll_step1_info">Input PIN</string>
     <string name="pin_lock_enroll_step2_info">Input again</string>

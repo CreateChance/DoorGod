@@ -2,6 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="com.createchance.doorgod.lockfragments.PatternLockFragment">
 
     <LinearLayout
@@ -15,8 +16,9 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="50dp"
+            android:fontFamily="sans-serif-thin"
             android:text="@string/fragment_pattern_view_title"
-            android:textColor="@color/patternViewDot"
+            android:textColor="@color/white"
             android:textSize="25sp"/>
 
         <TextView
@@ -24,8 +26,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
+            android:fontFamily="sans-serif-thin"
             android:text="@string/fragment_pattern_view_fingerprint"
-            android:textColor="@color/patternViewDot"
+            android:textColor="@color/white"
             android:textSize="20sp"/>
 
         <ImageView
@@ -35,17 +38,21 @@
             android:layout_gravity="center_horizontal"
             android:src="@drawable/ic_fingerprint_white_48dp"/>
 
-        <com.eftimoff.patternview.PatternView
-            xmlns:patternview="http://schemas.android.com/apk/res-auto"
+        <com.takwolf.android.lock9.Lock9View
             android:id="@+id/patternView"
-            android:layout_gravity="center"
-            android:layout_marginTop="80dp"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="50dp"
-            patternview:dotColor="@color/patternViewDot"
-            patternview:circleColor="@color/patternViewDot"
-            patternview:pathColor="@color/patternViewDot"/>
+            android:layout_gravity="center"
+            app:lock9_nodeSrc="@drawable/node_normal"
+            app:lock9_nodeOnSrc="@drawable/node_active"
+            app:lock9_nodeOnAnim="@anim/node_on_scale"
+            app:lock9_padding="50dp"
+            app:lock9_spacing="50dp"
+            app:lock9_lineColor="@color/patternViewColor"
+            app:lock9_lineWidth="8dp"
+            app:lock9_autoLink="false"
+            app:lock9_enableVibrate="true"
+            app:lock9_vibrateTime="20" />
 
     </LinearLayout>
 

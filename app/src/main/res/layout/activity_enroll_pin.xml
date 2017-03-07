@@ -9,10 +9,10 @@
 
     <ImageView
         android:id="@+id/pin_lock_icon"
-        android:layout_width="84dp"
-        android:layout_height="84dp"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="100dp"
         android:src="@drawable/ic_lock_white_48dp" />
 
     <TextView
@@ -21,13 +21,13 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/pin_lock_icon"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="36dp"
+        android:layout_marginTop="35dp"
         android:fontFamily="sans-serif-thin"
         android:gravity="center"
         android:maxLines="1"
         android:text="@string/pin_lock_enroll_step1_info"
         android:textColor="@color/white"
-        android:textSize="34sp" />
+        android:textSize="25sp" />
 
     <com.andrognito.pinlockview.IndicatorDots
         android:id="@+id/indicator_dots"
