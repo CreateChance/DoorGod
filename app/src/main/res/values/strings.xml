@@ -22,6 +22,7 @@
     <string name="fragment_pattern_view_title">Please draw your pattern</string>
     <string name="fragment_pattern_view_fingerprint">Finger print can unlock too</string>
     <string name="fragment_pattern_view_fingerprint_no_enroll">No fingerprint enrolled, click here to enroll</string>
+    <string name="fragment_pattern_view_pattern_error">Pattern error</string>
 
     <string name="fragment_pin_lock_view_title">Input PIN code</string>
 

@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.createchance.doorgod.R;
 import com.createchance.doorgod.database.LockInfo;
@@ -72,8 +73,10 @@ public class PatternLockFragment extends Fragment {
                     mService.cancelFingerprint();
                     getActivity().finish();
                 } else {
+                    Toast.makeText(getActivity(),
+                            R.string.fragment_pattern_view_pattern_error, Toast.LENGTH_SHORT).show();
                     patternView.setDisplayMode(PatternView.DisplayMode.Wrong);
-                    patternView.clearPattern(1000);
+                    patternView.clearPattern(500);
                 }
             }
         });

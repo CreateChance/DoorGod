@@ -27,6 +27,7 @@
     <string name="fragment_pattern_view_title">请绘制您的图案</string>
     <string name="fragment_pattern_view_fingerprint">指纹也可解锁</string>
     <string name="fragment_pattern_view_fingerprint_no_enroll">暂无指纹注册，点击这里注册</string>
+    <string name="fragment_pattern_view_pattern_error">图案错误</string>
 
     <string name="fragment_pin_lock_view_title">请输入密码</string>
 
