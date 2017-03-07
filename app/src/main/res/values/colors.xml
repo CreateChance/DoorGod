@@ -4,5 +4,5 @@
     <color name="colorPrimaryDark">#263238</color>
     <color name="colorAccent">#5A595B</color>
 
-    <color name="patternViewDot">#36B34A</color>
+    <color name="patternViewColor">#006699</color>
 </resources>

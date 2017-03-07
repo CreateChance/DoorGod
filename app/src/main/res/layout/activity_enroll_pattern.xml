@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/activity_enroll_pattern"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -11,44 +11,43 @@
         android:id="@+id/enroll_info"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="150dp"
+        android:layout_marginTop="80dp"
         android:layout_centerHorizontal="true"
         android:gravity="center"
+        android:fontFamily="sans-serif-thin"
         android:text="@string/pattern_lock_enroll_step1_info"
         android:textSize="25sp"
-        android:textColor="@color/patternViewDot"/>
+        android:textColor="@color/white"/>
 
-    <com.eftimoff.patternview.PatternView
-        xmlns:patternview="http://schemas.android.com/apk/res-auto"
+    <com.takwolf.android.lock9.Lock9View
         android:id="@+id/patternView"
-        android:layout_below="@id/enroll_info"
-        android:layout_centerInParent="true"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        patternview:dotColor="@color/patternViewDot"
-        patternview:circleColor="@color/patternViewDot"
-        patternview:pathColor="@color/patternViewDot"/>
+        android:layout_gravity="center"
+        android:layout_below="@id/enroll_info"
+        app:lock9_nodeSrc="@drawable/node_normal"
+        app:lock9_nodeOnSrc="@drawable/node_active"
+        app:lock9_nodeOnAnim="@anim/node_on_scale"
+        app:lock9_padding="50dp"
+        app:lock9_spacing="50dp"
+        app:lock9_lineColor="@color/patternViewColor"
+        app:lock9_lineWidth="8dp"
+        app:lock9_autoLink="false"
+        app:lock9_enableVibrate="true"
+        app:lock9_vibrateTime="20" />
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
-        android:layout_alignParentBottom="true">
+        android:layout_below="@id/patternView">
 
         <Button
             android:id="@+id/btn_cancel"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:text="@string/lock_enroll_btn_cancel" />
-
-        <Button
-            android:id="@+id/btn_ok"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/lock_enroll_btn_step1" />
 
     </LinearLayout>
 

@@ -19,7 +19,7 @@ import com.createchance.doorgod.ui.AppListActivity;
 import com.createchance.doorgod.ui.DoorGodActivity;
 import com.createchance.doorgod.util.FingerprintAuthResponse;
 import com.createchance.doorgod.util.LogUtil;
-import com.eftimoff.patternview.PatternView;
+import com.takwolf.android.lock9.Lock9View;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -33,7 +33,7 @@ public class PatternLockFragment extends Fragment {
     private TextView fingerprintInfo;
     private ImageView fingerprintIcon;
 
-    private PatternView patternView;
+    private Lock9View patternView;
 
     private DoorGodService.ServiceBinder mService;
 
@@ -57,13 +57,13 @@ public class PatternLockFragment extends Fragment {
         fingerprintInfo = (TextView) view.findViewById(R.id.fingerprint_hint);
         fingerprintIcon = (ImageView) view.findViewById(R.id.fingerprint_icon);
 
-        patternView = (PatternView) view.findViewById(R.id.patternView);
-        patternView.setOnPatternDetectedListener(new PatternView.OnPatternDetectedListener() {
+        patternView = (Lock9View) view.findViewById(R.id.patternView);
+        patternView.setCallBack(new Lock9View.CallBack() {
             @Override
-            public void onPatternDetected() {
+            public void onFinish(String password) {
                 LogUtil.d(TAG, "pattern detected.");
                 LockInfo lockInfo = DataSupport.findFirst(LockInfo.class);
-                if (patternView.getPatternString().equals(lockInfo.getLockString())) {
+                if (password.equals(lockInfo.getLockString())) {
                     if (((DoorGodActivity)getActivity()).isLaunchFromHome()) {
                         Intent intent = new Intent(getActivity(), AppListActivity.class);
                         startActivity(intent);
@@ -75,8 +75,8 @@ public class PatternLockFragment extends Fragment {
                 } else {
                     Toast.makeText(getActivity(),
                             R.string.fragment_pattern_view_pattern_error, Toast.LENGTH_SHORT).show();
-                    patternView.setDisplayMode(PatternView.DisplayMode.Wrong);
-                    patternView.clearPattern(500);
+                    //patternView.setDisplayMode(PatternView.DisplayMode.Wrong);
+                    //patternView.clearPattern(500);
                 }
             }
         });

@@ -14,15 +14,14 @@ import android.widget.Toast;
 import com.createchance.doorgod.R;
 import com.createchance.doorgod.service.DoorGodService;
 import com.createchance.doorgod.util.LockTypeUtil;
-import com.eftimoff.patternview.PatternView;
+import com.takwolf.android.lock9.Lock9View;
 
 public class EnrollPatternActivity extends AppCompatActivity {
 
     private static final String TAG = "EnrollPatternActivity";
 
     private Button btnCancel;
-    private Button btnOk;
-    private PatternView patternView;
+    private Lock9View patternView;
     private TextView enrollInfo;
 
     private boolean isPatternConfirm = false;
@@ -51,48 +50,38 @@ public class EnrollPatternActivity extends AppCompatActivity {
         Intent intent = new Intent(this, DoorGodService.class);
         bindService(intent, mConnection, BIND_AUTO_CREATE);
 
-        patternView = (PatternView) findViewById(R.id.patternView);
-        enrollInfo = (TextView) findViewById(R.id.enroll_info);
-        btnCancel = (Button) findViewById(R.id.btn_cancel);
-        btnOk = (Button) findViewById(R.id.btn_ok);
-        btnCancel.setOnClickListener(new View.OnClickListener() {
+        patternView = (Lock9View) findViewById(R.id.patternView);
+        patternView.setCallBack(new Lock9View.CallBack() {
             @Override
-            public void onClick(View v) {
-                setResult(RESULT_CANCELED);
-                finish();
-            }
-        });
-        btnOk.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+            public void onFinish(String password) {
                 if (isPatternConfirm) {
                     isPatternConfirm = false;
-                    if (patternString.equals(patternView.getPatternString())) {
+                    if (patternString.equals(password)) {
                         // save lock info.
                         mService.saveLockInfo(patternString, LockTypeUtil.TYPE_PATTERN);
                         // stop ourselves
                         setResult(RESULT_OK);
                         finish();
                     } else {
-                        btnOk.setText(R.string.lock_enroll_btn_step1);
                         enrollInfo.setText(R.string.pattern_lock_enroll_step1_info);
                         Toast.makeText(EnrollPatternActivity.this,
                                 R.string.pattern_lock_enroll_info_mismatch, Toast.LENGTH_LONG).show();
                     }
                 } else {
-                    patternString = patternView.getPatternString();
-                    if (patternString.equals("")) {
-                        Toast.makeText(EnrollPatternActivity.this,
-                                R.string.pattern_lock_enroll_toast_empty, Toast.LENGTH_SHORT).show();
-                    } else {
-                        isPatternConfirm = true;
-                        btnOk.setText(R.string.lock_enroll_btn_step2);
-                        enrollInfo.setText(R.string.pattern_lock_enroll_step2_info);
-                    }
+                    patternString = password;
+                    isPatternConfirm = true;
+                    enrollInfo.setText(R.string.pattern_lock_enroll_step2_info);
                 }
+            }
+        });
 
-                // clear pad.
-                patternView.clearPattern();
+        enrollInfo = (TextView) findViewById(R.id.enroll_info);
+        btnCancel = (Button) findViewById(R.id.btn_cancel);
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setResult(RESULT_CANCELED);
+                finish();
             }
         });
     }
