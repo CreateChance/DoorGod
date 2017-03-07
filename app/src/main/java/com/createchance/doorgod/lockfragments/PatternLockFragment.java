@@ -1,13 +1,17 @@
 package com.createchance.doorgod.lockfragments;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -19,7 +23,6 @@ import com.createchance.doorgod.ui.AppListActivity;
 import com.createchance.doorgod.ui.DoorGodActivity;
 import com.createchance.doorgod.util.FingerprintAuthResponse;
 import com.createchance.doorgod.util.LogUtil;
-import com.takwolf.android.lock9.Lock9View;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -32,10 +35,15 @@ public class PatternLockFragment extends Fragment {
 
     private TextView fingerprintInfo;
     private ImageView fingerprintIcon;
+    private Button moreButton;
 
     private Lock9View patternView;
 
     private DoorGodService.ServiceBinder mService;
+
+    private SharedPreferences mPrefs;
+    private static final String LOCK_ENROLL_STATUS = "com.createchance.doorgod.LOCK_ENROLL_STATUS";
+    private static final String LOCK_ANIM = "LOCK_ANIM";
 
     public PatternLockFragment() {
         // Required empty public constructor
@@ -45,6 +53,10 @@ public class PatternLockFragment extends Fragment {
     public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+
+        // get prefs
+        mPrefs = getActivity().getSharedPreferences(LOCK_ENROLL_STATUS, Context.MODE_PRIVATE);
+
         EventBus.getDefault().register(this);
 
         // get service.
@@ -52,10 +64,6 @@ public class PatternLockFragment extends Fragment {
 
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_pattern_lock, container, false);
-
-        // If this device has finger print sensor and enrolls one, we will show fingerprint info.
-        fingerprintInfo = (TextView) view.findViewById(R.id.fingerprint_hint);
-        fingerprintIcon = (ImageView) view.findViewById(R.id.fingerprint_icon);
 
         patternView = (Lock9View) view.findViewById(R.id.patternView);
         patternView.setCallBack(new Lock9View.CallBack() {
@@ -78,6 +86,38 @@ public class PatternLockFragment extends Fragment {
                     //patternView.setDisplayMode(PatternView.DisplayMode.Wrong);
                     //patternView.clearPattern(500);
                 }
+            }
+        });
+
+        // If this device has finger print sensor and enrolls one, we will show fingerprint info.
+        fingerprintInfo = (TextView) view.findViewById(R.id.fingerprint_hint);
+        fingerprintIcon = (ImageView) view.findViewById(R.id.fingerprint_icon);
+        moreButton = (Button) view.findViewById(R.id.pattern_lock_more);
+        moreButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setIcon(R.drawable.ic_settings_white_48dp)
+                        .setTitle(R.string.pattern_more_settings_anim_title)
+                        .setSingleChoiceItems(R.array.pattern_lock_anim,
+                                getSelectedPos(),
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        if (which == 0) {
+                                            // scale anim
+                                            patternView.setNodeOnAnim(R.anim.node_on_scale);
+                                        } else if (which == 1) {
+                                            // trans anim
+                                            patternView.setNodeOnAnim(R.anim.node_on_trans);
+                                        }
+                                        SharedPreferences.Editor editor = mPrefs.edit();
+                                        editor.putInt(LOCK_ANIM, which);
+                                        editor.commit();
+                                        dialog.dismiss();
+                                    }
+                                });
+                builder.create().show();
             }
         });
 
@@ -150,5 +190,9 @@ public class PatternLockFragment extends Fragment {
             default:
                 break;
         }
+    }
+
+    private int getSelectedPos() {
+        return mPrefs.getInt(LOCK_ANIM, -1);
     }
 }

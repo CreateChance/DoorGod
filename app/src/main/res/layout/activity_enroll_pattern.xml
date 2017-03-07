@@ -19,7 +19,7 @@
         android:textSize="25sp"
         android:textColor="@color/white"/>
 
-    <com.takwolf.android.lock9.Lock9View
+    <com.createchance.doorgod.lockfragments.Lock9View
         android:id="@+id/patternView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -27,7 +27,6 @@
         android:layout_below="@id/enroll_info"
         app:lock9_nodeSrc="@drawable/node_normal"
         app:lock9_nodeOnSrc="@drawable/node_active"
-        app:lock9_nodeOnAnim="@anim/node_on_scale"
         app:lock9_padding="50dp"
         app:lock9_spacing="50dp"
         app:lock9_lineColor="@color/patternViewColor"

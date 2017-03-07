@@ -51,4 +51,8 @@
 
     <string name="service_foreground_notification_title">DoorGod is protecting your apps.</string>
 
+    <string name="pattern_more_settings_anim_title">Choose a animation</string>
+    <string name="pattern_more_settings_anim_scale">Scale</string>
+    <string name="pattern_more_settings_anim_trans">Translate</string>
+
 </resources>

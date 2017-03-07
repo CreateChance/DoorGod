@@ -5,6 +5,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="com.createchance.doorgod.lockfragments.PatternLockFragment">
 
+    <Button
+        android:id="@+id/pattern_lock_more"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentEnd="true"
+        android:background="@drawable/ic_more_vert_white_48dp"/>
+
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
@@ -38,7 +45,7 @@
             android:layout_gravity="center_horizontal"
             android:src="@drawable/ic_fingerprint_white_48dp"/>
 
-        <com.takwolf.android.lock9.Lock9View
+        <com.createchance.doorgod.lockfragments.Lock9View
             android:id="@+id/patternView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

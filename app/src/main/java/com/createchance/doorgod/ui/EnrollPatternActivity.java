@@ -12,9 +12,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.createchance.doorgod.R;
+import com.createchance.doorgod.lockfragments.Lock9View;
 import com.createchance.doorgod.service.DoorGodService;
 import com.createchance.doorgod.util.LockTypeUtil;
-import com.takwolf.android.lock9.Lock9View;
 
 public class EnrollPatternActivity extends AppCompatActivity {
 

@@ -48,4 +48,8 @@
     <string name="no_lock_type_enrolled_warning">你必须指定一个解锁类型！</string>
 
     <string name="service_foreground_notification_title">门神正在保护您的应用。</string>
+
+    <string name="pattern_more_settings_anim_title">选择一个动画效果</string>
+    <string name="pattern_more_settings_anim_scale">缩放</string>
+    <string name="pattern_more_settings_anim_trans">移动</string>
 </resources>
