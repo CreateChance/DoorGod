@@ -7,6 +7,7 @@
         android:name="android.permission.PACKAGE_USAGE_STATS"
         tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.USE_FINGERPRINT" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 
     <application
         android:name="org.litepal.LitePalApplication"
@@ -49,6 +50,12 @@
         <activity android:name=".ui.SettingsActivity"
             android:exported="false"
             android:excludeFromRecents="true"/>
+
+        <receiver android:name=".service.BootUpReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
