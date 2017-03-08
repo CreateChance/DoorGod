@@ -66,6 +66,7 @@ public class PatternLockFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_pattern_lock, container, false);
 
         patternView = (Lock9View) view.findViewById(R.id.patternView);
+        patternView.setNodeOnAnim(getSelectedPos() == 0 ? R.anim.node_on_scale : R.anim.node_on_trans);
         patternView.setCallBack(new Lock9View.CallBack() {
             @Override
             public void onFinish(String password) {
