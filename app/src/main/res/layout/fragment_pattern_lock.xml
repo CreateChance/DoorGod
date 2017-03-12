@@ -45,22 +45,25 @@
             android:layout_gravity="center_horizontal"
             android:src="@drawable/ic_fingerprint_white_48dp"/>
 
-        <com.createchance.doorgod.lockfragments.Lock9View
-            android:id="@+id/patternView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            app:lock9_nodeSrc="@drawable/node_normal"
-            app:lock9_nodeOnSrc="@drawable/node_active"
-            app:lock9_nodeOnAnim="@anim/node_on_scale"
-            app:lock9_padding="50dp"
-            app:lock9_spacing="50dp"
-            app:lock9_lineColor="@color/patternViewColor"
-            app:lock9_lineWidth="8dp"
-            app:lock9_autoLink="false"
-            app:lock9_enableVibrate="true"
-            app:lock9_vibrateTime="20" />
-
     </LinearLayout>
+
+    <com.createchance.doorgod.lockfragments.Lock9View
+        android:id="@+id/patternView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginBottom="80dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        app:lock9_nodeSrc="@drawable/node_normal"
+        app:lock9_nodeOnSrc="@drawable/node_active"
+        app:lock9_nodeOnAnim="@anim/node_on_scale"
+        app:lock9_padding="50dp"
+        app:lock9_spacing="50dp"
+        app:lock9_lineColor="@color/patternViewColor"
+        app:lock9_lineWidth="8dp"
+        app:lock9_autoLink="false"
+        app:lock9_enableVibrate="true"
+        app:lock9_vibrateTime="20" />
 
 </RelativeLayout>
