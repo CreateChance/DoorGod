@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -18,7 +19,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -36,8 +36,6 @@ import com.createchance.doorgod.util.LogUtil;
 
 import org.greenrobot.eventbus.EventBus;
 
-import java.util.List;
-
 public class AppListActivity extends AppCompatActivity {
 
     private static final String TAG = "AppListActivity";
@@ -51,9 +49,8 @@ public class AppListActivity extends AppCompatActivity {
 
     private FloatingActionButton doneBtn;
 
-    private List<AppInfo> mAppInfoList;
-
-    private AppAdapter mAppAdapter;
+    private AppAdapter mProtectedAppAdapter;
+    private AppAdapter mUnprotectedAppAdapter;
 
     private HomeKeyWatcher mHomeKeyWatcher;
 
@@ -69,14 +66,30 @@ public class AppListActivity extends AppCompatActivity {
             mService = (DoorGodService.ServiceBinder) service;
 
             if (mService != null) {
-                if (mAppInfoList == null) {
-                    mAppInfoList = mService.getAppList();
-                    RecyclerView recyclerView = (RecyclerView) findViewById(R.id.app_list_view);
-                    LinearLayoutManager layoutManager = new LinearLayoutManager(AppListActivity.this);
-                    recyclerView.setLayoutManager(layoutManager);
-                    mAppAdapter = new AppAdapter(mAppInfoList, mService);
-                    recyclerView.setAdapter(mAppAdapter);
-                }
+                final RecyclerView protectedRecyclerView = (RecyclerView) findViewById(R.id.protected_app_list_view);
+                protectedRecyclerView.setLayoutManager(new LinearLayoutManager(AppListActivity.this));
+                mProtectedAppAdapter = new AppAdapter(AppAdapter.TYPE_PROTECTED, mService.getProtectedAppList(), new AppAdapter.OnClickCallback() {
+                    @Override
+                    public void onClick(AppInfo info) {
+                        mService.markToUnprotect(info);
+                        mUnprotectedAppAdapter.notifyDataSetChanged();
+                        mProtectedAppAdapter.notifyDataSetChanged();
+                    }
+                });
+                protectedRecyclerView.setAdapter(mProtectedAppAdapter);
+
+                RecyclerView unprotectedRecyclerView = (RecyclerView) findViewById(R.id.unprotected_app_list_view);
+                unprotectedRecyclerView.setLayoutManager(new LinearLayoutManager(AppListActivity.this));
+                mUnprotectedAppAdapter = new AppAdapter(AppAdapter.TYPE_UNPROTECTED, mService.getUnProtectedAppList(), new AppAdapter.OnClickCallback() {
+                    @Override
+                    public void onClick(AppInfo info) {
+                        int size = mService.markToProtect(info);
+                        mUnprotectedAppAdapter.notifyDataSetChanged();
+                        mProtectedAppAdapter.notifyDataSetChanged();
+                        protectedRecyclerView.smoothScrollToPosition(size);
+                    }
+                });
+                unprotectedRecyclerView.setAdapter(mUnprotectedAppAdapter);
             }
         }
 
@@ -90,7 +103,6 @@ public class AppListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
 
         // get prefs
         mPrefs = getSharedPreferences(LOCK_ENROLL_STATUS, MODE_PRIVATE);
@@ -135,9 +147,14 @@ public class AppListActivity extends AppCompatActivity {
         doneBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mService.addProtectedApp(mAppAdapter.getProtectedAppList());
-                Snackbar.make(view, getString(R.string.snack_info), Snackbar.LENGTH_LONG)
-                        .show();
+                if (mService.isProtectedAppListChanged()) {
+                    mService.saveProtectList();
+                    Snackbar.make(view, getString(R.string.snack_info_saved), Snackbar.LENGTH_LONG)
+                            .show();
+                } else {
+                    Snackbar.make(view, getString(R.string.snack_info_no_change), Snackbar.LENGTH_LONG)
+                            .show();
+                }
             }
         });
 
@@ -151,7 +168,7 @@ public class AppListActivity extends AppCompatActivity {
         mHomeKeyWatcher.setOnHomePressedListener(new HomeKeyWatcher.OnHomePressedListener() {
             @Override
             public void onHomePressed() {
-                if (mAppAdapter.isConfigChanged()) {
+                if (mService.isProtectedAppListChanged()) {
                     Toast.makeText(AppListActivity.this,
                             R.string.toast_info_config_not_saved, Toast.LENGTH_LONG).show();
                 }
@@ -240,7 +257,7 @@ public class AppListActivity extends AppCompatActivity {
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (mAppAdapter.isConfigChanged() && (keyCode == KeyEvent.KEYCODE_BACK)) {
+        if (mService.isProtectedAppListChanged() && (keyCode == KeyEvent.KEYCODE_BACK)) {
             showConfigChangedDialog();
 
             return true;
@@ -259,6 +276,7 @@ public class AppListActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         // User choose to discard changes, so we just quit.
+                        mService.discardProtectListSettings();
                         dialog.dismiss();
                         finish();
                     }
