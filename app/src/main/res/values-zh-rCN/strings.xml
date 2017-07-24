@@ -5,7 +5,8 @@
     <string name="menu_title_settings">设置</string>
     <string name="menu_title_about">关于</string>
 
-    <string name="snack_info">设置已更新</string>
+    <string name="snack_info_saved">设置已保存</string>
+    <string name="snack_info_no_change">没有任何改动</string>
 
     <string name="dialog_title_warning">警告</string>
     <string name="dialog_content_config_changed">当前配置已经改变，您确定要舍弃吗？</string>
@@ -52,4 +53,9 @@
     <string name="pattern_more_settings_anim_title">选择一个动画效果</string>
     <string name="pattern_more_settings_anim_scale">缩放</string>
     <string name="pattern_more_settings_anim_trans">移动</string>
+
+    <string name="app_list_activity_protected_title">已保护的应用</string>
+    <string name="app_list_activity_unprotected_title">未保护的应用</string>
+    <string name="author_email">createchance@163.com</string>
+    <string name="author_name">CreateChance</string>
 </resources>

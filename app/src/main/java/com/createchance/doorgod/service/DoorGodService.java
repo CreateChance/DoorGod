@@ -53,15 +53,17 @@ public class DoorGodService extends Service {
 
     private static final String TAG = "DoorGodService";
 
-    private List<AppInfo> mAppInfoList = new ArrayList<>();
-
     private PackageManager mPm;
 
     private UsageStatsManager mUsageStatsManager;
 
     private AppStartWatchThread mAppStartWatchThread;
 
-    private List<String> mProtectedAppList;
+    private List<AppInfo> mProtectedAppList = new ArrayList<>();
+
+    private List<AppInfo> mUnprotectedAppList = new ArrayList<>();
+
+    private Set<String> mCheckList = new HashSet<>();
 
     private String currentLockedApp;
 
@@ -103,34 +105,67 @@ public class DoorGodService extends Service {
 
     private ServiceBinder mBinder = new ServiceBinder();
     public class ServiceBinder extends Binder {
-        public List<AppInfo> getAppList() {
-            return mAppInfoList;
+        public List<AppInfo> getProtectedAppList() {
+            return mProtectedAppList;
         }
 
-        public List<String> getProtectedAppList() {
-            List<String> applist = new ArrayList<>();
-
-            List<ProtectedApplication> applicationList = DataSupport.findAll(ProtectedApplication.class);
-            for (ProtectedApplication application: applicationList) {
-                applist.add(application.getPackageName());
-            }
-
-            return applist;
+        public List<AppInfo> getUnProtectedAppList() {
+            return mUnprotectedAppList;
         }
 
-        public void addProtectedApp(List<String> list) {
-            // remove all the apps first.
+        public int markToProtect(AppInfo appInfo) {
+            LogUtil.d(TAG, "mark to protect: " + appInfo);
+
+            mUnprotectedAppList.remove(appInfo);
+            mProtectedAppList.add(appInfo);
+
+            return mProtectedAppList.size();
+        }
+
+        public int markToUnprotect(AppInfo appInfo) {
+            LogUtil.d(TAG, "mark to unprotect: " + appInfo);
+
+            mProtectedAppList.remove(appInfo);
+            mUnprotectedAppList.add(appInfo);
+
+            return mUnprotectedAppList.size();
+        }
+
+        public void saveProtectList() {
             removeAllProtectedApp();
-            // then add protected apps.
-            for (String app:list) {
-                LogUtil.d(TAG, "add app: " + app);
-                ProtectedApplication application = new ProtectedApplication();
-                application.setPackageName(app);
-                application.save();
+            mCheckList.clear();
+
+            for (AppInfo info : mProtectedAppList) {
+                ProtectedApplication app = new ProtectedApplication();
+                app.setPackageName(info.getAppPackageName());
+                app.save();
+                // create new check list
+                mCheckList.add(info.getAppPackageName());
+            }
+        }
+
+        public void discardProtectListSettings() {
+            mProtectedAppList.clear();
+            mUnprotectedAppList.clear();
+            // do init again if user discard settings.
+            initAppList();
+        }
+
+        public boolean isProtectedAppListChanged() {
+            List<ProtectedApplication> protectedList = DataSupport.findAll(ProtectedApplication.class);
+
+            if (protectedList.size() == mProtectedAppList.size()) {
+                for (int i = 0; i < mProtectedAppList.size(); i++) {
+                    ProtectedApplication app = new ProtectedApplication(mProtectedAppList.get(i).getAppPackageName());
+                    if (!protectedList.contains(app)) {
+                        return true;
+                    }
+                }
+            } else {
+                return true;
             }
 
-            // update protected app list.
-            mProtectedAppList = getProtectedAppList();
+            return false;
         }
 
         public void addUnlockedApp() {
@@ -296,7 +331,7 @@ public class DoorGodService extends Service {
     }
 
     private void initAppList() {
-        LogUtil.d(TAG, "Init installed app list.");
+        LogUtil.d(TAG, "Init protected and unprotected app list.");
         Intent intent = new Intent();
         intent.setAction(Intent.ACTION_MAIN);
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
@@ -304,6 +339,9 @@ public class DoorGodService extends Service {
 
         // sort the results
         Collections.sort(homeApps, new ResolveInfo.DisplayNameComparator(mPm));
+
+        // get protected app list from database.
+        List<ProtectedApplication> protectedList = DataSupport.findAll(ProtectedApplication.class);
 
         Set<String> packageNameSet = new HashSet<>();
         for (ResolveInfo info : homeApps) {
@@ -318,7 +356,14 @@ public class DoorGodService extends Service {
                 appInfo.setAppPackageName(info.activityInfo.packageName);
                 appInfo.setAppName((String) info.activityInfo.applicationInfo.loadLabel(mPm));
                 appInfo.setAppIcon(info.activityInfo.applicationInfo.loadIcon(mPm));
-                mAppInfoList.add(appInfo);
+
+                if (protectedList.contains(new ProtectedApplication(info.activityInfo.packageName))) {
+                    mProtectedAppList.add(appInfo);
+                    // init check list
+                    mCheckList.add(appInfo.getAppPackageName());
+                } else {
+                    mUnprotectedAppList.add(appInfo);
+                }
             }
         }
     }
@@ -335,7 +380,7 @@ public class DoorGodService extends Service {
             }
             if (!usageStatsMap.isEmpty()) {
                 String topPackageName = usageStatsMap.get(usageStatsMap.lastKey()).getPackageName();
-                if (mProtectedAppList.contains(topPackageName)
+                if (mCheckList.contains(topPackageName)
                         && !mUnlockedAppList.contains(topPackageName)) {
                     LogUtil.d(TAG, "protecting: " + topPackageName);
                     Intent intent = new Intent(DoorGodService.this, DoorGodActivity.class);

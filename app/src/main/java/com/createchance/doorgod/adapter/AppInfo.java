@@ -36,4 +36,31 @@ public class AppInfo {
     public void setAppPackageName(String appPackageName) {
         this.appPackageName = appPackageName;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+
+        if (!(obj instanceof AppInfo)) {
+            return false;
+        }
+
+        // if package name equals, that means the same app.
+        if (!((AppInfo) obj).getAppPackageName().equals(this.appPackageName)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "AppInfo{" +
+                "appName='" + appName + '\'' +
+                ", appIcon=" + appIcon +
+                ", appPackageName='" + appPackageName + '\'' +
+                '}';
+    }
 }

@@ -11,8 +11,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.createchance.doorgod.R;
-import com.createchance.doorgod.service.DoorGodService;
-import com.createchance.doorgod.util.LogUtil;
 
 import java.util.List;
 
@@ -22,13 +20,16 @@ import java.util.List;
 
 public class AppAdapter extends RecyclerView.Adapter<AppAdapter.ViewHolder> {
 
+    public static final int TYPE_PROTECTED = 100;
+    public static final int TYPE_UNPROTECTED = 101;
+
     private static final String TAG = "AppAdapter";
 
     private Context context;
 
-    private DoorGodService.ServiceBinder mService;
+    private int type;
 
-    private List<String> protectedAppList;
+    private OnClickCallback mCallback;
 
     private List<AppInfo> appInfoList;
 
@@ -50,10 +51,10 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.ViewHolder> {
         }
     }
 
-    public AppAdapter(List<AppInfo> list, DoorGodService.ServiceBinder service) {
+    public AppAdapter(int type, List<AppInfo> list, OnClickCallback callback) {
+        this.type = type;
         this.appInfoList = list;
-        this.mService = service;
-        this.protectedAppList = service.getProtectedAppList();
+        this.mCallback = callback;
     }
 
     @Override
@@ -68,14 +69,8 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.ViewHolder> {
         holder.appCheckedView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String pkgName = appInfoList.get(holder.getAdapterPosition()).getAppPackageName();
-                if (((CheckBox)view).isChecked()) {
-                    LogUtil.v(TAG, "Ready to add: " + pkgName);
-                    protectedAppList.add(pkgName);
-                } else {
-                    LogUtil.v(TAG, "Ready to remove: " + pkgName);
-                    protectedAppList.remove(pkgName);
-                }
+                AppInfo appInfo = appInfoList.get(holder.getAdapterPosition());
+                mCallback.onClick(appInfo);
             }
         });
 
@@ -88,9 +83,9 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.ViewHolder> {
         holder.appIconView.setImageDrawable(info.getAppIcon());
         holder.appNameView.setText(info.getAppName());
         holder.appPackageNameView.setText(info.getAppPackageName());
-        if (protectedAppList.contains(info.getAppPackageName())) {
+        if (type == TYPE_PROTECTED) {
             holder.appCheckedView.setChecked(true);
-        } else {
+        } else if (type == TYPE_UNPROTECTED) {
             holder.appCheckedView.setChecked(false);
         }
     }
@@ -100,23 +95,7 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.ViewHolder> {
         return appInfoList.size();
     }
 
-    public List<String> getProtectedAppList() {
-        return protectedAppList;
-    }
-
-    public boolean isConfigChanged() {
-        // compare to saved configuration.
-        List<String> appList = mService.getProtectedAppList();
-        if (appList.size() == protectedAppList.size()) {
-            for (int i = 0; i < appList.size(); i++) {
-                if (!appList.get(i).equals(protectedAppList.get(i))) {
-                    return true;
-                }
-            }
-        } else {
-            return true;
-        }
-
-        return false;
+    public interface OnClickCallback {
+        void onClick(AppInfo info);
     }
 }
