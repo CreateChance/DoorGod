@@ -7,8 +7,9 @@
         android:name="android.permission.PACKAGE_USAGE_STATS"
         tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.USE_FINGERPRINT" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
     <application
         android:name="org.litepal.LitePalApplication"
@@ -20,10 +21,9 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".ui.AppListActivity"
-            android:screenOrientation="portrait"
+            android:excludeFromRecents="true"
             android:exported="false"
-            android:excludeFromRecents="true">
-        </activity>
+            android:screenOrientation="portrait"/>
 
         <service
             android:name=".service.DoorGodService"
@@ -32,31 +32,38 @@
 
         <activity
             android:name=".ui.DoorGodActivity"
+            android:excludeFromRecents="true"
             android:launchMode="singleInstance"
-            android:screenOrientation="portrait"
             android:noHistory="true"
-            android:excludeFromRecents="true">
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.EnrollPatternActivity"
-            android:exported="false"
-            android:excludeFromRecents="true"/>
-        <activity android:name=".ui.EnrollPinActivity"
-            android:exported="false"
-            android:excludeFromRecents="true"/>
-        <activity android:name=".ui.SettingsActivity"
-            android:exported="false"
-            android:excludeFromRecents="true"/>
+        <activity
+            android:name=".ui.EnrollPatternActivity"
+            android:excludeFromRecents="true"
+            android:exported="false" />
+        <activity
+            android:name=".ui.EnrollPinActivity"
+            android:excludeFromRecents="true"
+            android:exported="false" />
+        <activity
+            android:name=".ui.SettingsActivity"
+            android:excludeFromRecents="true"
+            android:exported="false" />
 
         <receiver android:name=".service.BootUpReceiver">
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
+
+        <activity android:name=".ui.TrustedWifiSettingActivity"
+            android:excludeFromRecents="true"
+            android:exported="false"/>
     </application>
 
 </manifest>

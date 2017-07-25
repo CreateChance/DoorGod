@@ -12,6 +12,9 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.BitmapFactory;
+import android.net.NetworkInfo;
+import android.net.wifi.WifiConfiguration;
+import android.net.wifi.WifiManager;
 import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
@@ -23,6 +26,7 @@ import com.createchance.doorgod.R;
 import com.createchance.doorgod.adapter.AppInfo;
 import com.createchance.doorgod.database.LockInfo;
 import com.createchance.doorgod.database.ProtectedApplication;
+import com.createchance.doorgod.database.TrustedWifi;
 import com.createchance.doorgod.fingerprint.CryptoObjectHelper;
 import com.createchance.doorgod.fingerprint.MyAuthCallback;
 import com.createchance.doorgod.ui.DoorGodActivity;
@@ -56,6 +60,12 @@ public class DoorGodService extends Service {
     private PackageManager mPm;
 
     private UsageStatsManager mUsageStatsManager;
+
+    private WifiManager mWifiManager;
+
+    private List<String> mSavedWifiList = new ArrayList<>();
+    private List<String> mTrustedWifiList = new ArrayList<>();
+    private String mConnectedWifi;
 
     private AppStartWatchThread mAppStartWatchThread;
 
@@ -99,6 +109,18 @@ public class DoorGodService extends Service {
 
             } else if (action.equals(Intent.ACTION_SCREEN_ON)) {
                 isScreenOn = true;
+            } else if (action.equals(WifiManager.NETWORK_STATE_CHANGED_ACTION)) {
+                NetworkInfo info = intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
+                if (info.getState().equals(NetworkInfo.State.CONNECTED)) {
+                    initConnectedWifi();
+                } else if (info.getState().equals(NetworkInfo.State.DISCONNECTED)) {
+                    mConnectedWifi = null;
+                }
+            } else if (action.equals(WifiManager.WIFI_STATE_CHANGED_ACTION)) {
+                int state = intent.getIntExtra(WifiManager.EXTRA_WIFI_STATE, WifiManager.WIFI_STATE_DISABLED);
+                if (state == WifiManager.WIFI_STATE_ENABLED) {
+                    initSavedWifiList();
+                }
             }
         }
     };
@@ -198,6 +220,41 @@ public class DoorGodService extends Service {
             return lockType;
         }
 
+        public boolean isWifiEnabled() {
+            return mWifiManager.isWifiEnabled();
+        }
+
+        public List<String> getSavedWifiList() {
+            initSavedWifiList();
+
+            return mSavedWifiList;
+        }
+
+        public void setTrustedWifi(String ssid) {
+            TrustedWifi trustedWifi = new TrustedWifi();
+            trustedWifi.setSsid(ssid);
+            trustedWifi.save();
+
+            mTrustedWifiList.add(ssid);
+        }
+
+        public void removeTrustedWifi(String ssid) {
+            DataSupport.deleteAll(TrustedWifi.class, "ssid = ?", ssid);
+
+            mTrustedWifiList.remove(ssid);
+        }
+
+        public List<String> getTrustedWifi() {
+            initTrustedWifiList();
+
+            return mTrustedWifiList;
+        }
+
+        // return connected wifi ssid, null if wifi disconnected.
+        public String getConnectedWifiSsid() {
+            return mConnectedWifi;
+        }
+
         public void startFingerprintAuth() {
             EventBus.getDefault().post(new FingerprintAuthRequest());
         }
@@ -254,6 +311,13 @@ public class DoorGodService extends Service {
 
         mUsageStatsManager = (UsageStatsManager) getSystemService(Context.USAGE_STATS_SERVICE);
 
+        mWifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        initTrustedWifiList();
+        if (mWifiManager.isWifiEnabled()) {
+            initSavedWifiList();
+            initConnectedWifi();
+        }
+
         mProtectedAppList = mBinder.getProtectedAppList();
 
         // start working thread.
@@ -263,6 +327,8 @@ public class DoorGodService extends Service {
         // register screen state listener.
         IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
         filter.addAction(Intent.ACTION_SCREEN_ON);
+        filter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
+        filter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
         registerReceiver(mReceiver, filter);
 
         makeForeground();
@@ -368,7 +434,43 @@ public class DoorGodService extends Service {
         }
     }
 
+    private void initSavedWifiList() {
+        mSavedWifiList.clear();
+        List<WifiConfiguration> list = mWifiManager.getConfiguredNetworks();
+        for (WifiConfiguration configuration : list) {
+            mSavedWifiList.add(configuration.SSID);
+        }
+
+        // remove old ssid cause it is removed by user.
+        for (String ssid : mTrustedWifiList) {
+            if (!mSavedWifiList.contains(ssid)) {
+                mTrustedWifiList.remove(ssid);
+                DataSupport.deleteAll(TrustedWifi.class, "ssid = ?", ssid);
+            }
+        }
+    }
+
+    private void initTrustedWifiList() {
+        mTrustedWifiList.clear();
+        List<TrustedWifi> trustedWifis = DataSupport.findAll(TrustedWifi.class);
+
+        for (TrustedWifi wifi : trustedWifis)  {
+            mTrustedWifiList.add(wifi.getSsid());
+        }
+    }
+
+    private void initConnectedWifi() {
+        mConnectedWifi = mWifiManager.getConnectionInfo().getSSID();
+        LogUtil.d(TAG, "connected wifi: " + mConnectedWifi);
+    }
+
     private void checkIfNeedProtection() {
+
+        if (mTrustedWifiList.contains(mConnectedWifi)) {
+            // if we are connected to trusted wifi, so do not check.
+            return;
+        }
+
         long time = System.currentTimeMillis();
         List<UsageStats> usageStatsList = mUsageStatsManager.
                 queryUsageStats(UsageStatsManager.INTERVAL_BEST, time - 2000, time);

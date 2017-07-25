@@ -43,6 +43,12 @@
     <string name="settings_lock_type_title">设置锁屏方式</string>
     <string name="settings_lock_type_pattern">图案</string>
     <string name="settings_lock_type_pin">PIN码</string>
+    <string name="settings_trust_wifi">设置信任的wifi</string>
+    <string name="settings_trust_wifi_select_all">全选</string>
+    <string name="settings_trust_wifi_unselect_all">取消</string>
+    <string name="settings_trust_wifi_select_reverse">反选</string>
+    <string name="settings_trust_wifi_connected">已连接</string>
+    <string name="settings_trust_wifi_not_init_info">WIFI已关闭，请打开</string>
 
     <string name="first_start_info">这是第一次运行，请设置锁屏方式。</string>
 

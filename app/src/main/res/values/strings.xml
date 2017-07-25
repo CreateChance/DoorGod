@@ -45,6 +45,12 @@
     <string name="settings_lock_type_title">Set Lock type</string>
     <string name="settings_lock_type_pattern">Pattern</string>
     <string name="settings_lock_type_pin">PIN</string>
+    <string name="settings_trust_wifi">Set Trusted Wifi</string>
+    <string name="settings_trust_wifi_select_all">All</string>
+    <string name="settings_trust_wifi_unselect_all">Cancel</string>
+    <string name="settings_trust_wifi_select_reverse">Reverse</string>
+    <string name="settings_trust_wifi_connected">Connected</string>
+    <string name="settings_trust_wifi_not_init_info">WIFI disabled, please turn on.</string>
 
     <string name="first_start_info">This is first start, please set a lock type.</string>
 

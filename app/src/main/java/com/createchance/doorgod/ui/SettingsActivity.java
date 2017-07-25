@@ -5,14 +5,15 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.createchance.doorgod.R;
 import com.createchance.doorgod.service.DoorGodService;
@@ -120,7 +121,14 @@ public class SettingsActivity extends AppCompatActivity {
                                     }
                                 });
                 builder.create().show();
-
+                break;
+            case R.id.trust_wifi:
+                if (mService.isWifiEnabled()) {
+                    Intent intent = new Intent(SettingsActivity.this, TrustedWifiSettingActivity.class);
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(SettingsActivity.this, R.string.settings_trust_wifi_not_init_info, Toast.LENGTH_LONG).show();
+                }
                 break;
             default:
                 break;

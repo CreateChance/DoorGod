@@ -6,5 +6,6 @@
     <list>
         <mapping class="com.createchance.doorgod.database.ProtectedApplication"/>
         <mapping class="com.createchance.doorgod.database.LockInfo"/>
+        <mapping class="com.createchance.doorgod.database.TrustedWifi"/>
     </list>
 </litepal>
