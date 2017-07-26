@@ -52,7 +52,7 @@ public class IntrusionRecordSettingActivity extends AppCompatActivity {
 
         // get prefs
         mPrefs = getSharedPreferences(PREFS_INTRU_REC, MODE_PRIVATE);
-        mIntruRecEnabled.setChecked(mPrefs.getBoolean(KEY_INTRU_REC_ENABLED, false));
+        mIntruRecEnabled.setChecked(mPrefs.getBoolean(KEY_INTRU_REC_ENABLED, true));
         mAttemptTimesText.setText(getResources().
                 getStringArray(R.array.intru_rec_attempts_times)[mPrefs.getInt(KEY_INTRU_REC_ATTEMPTS_TIMES, 2) - 1]);
         if (!mPrefs.
