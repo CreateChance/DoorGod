@@ -272,8 +272,7 @@ public class DoorGodService extends Service {
 
             LogUtil.d(TAG, "isFingerprintEnrolled: " + enrolled);
 
-            return enrolled
-                    ;
+            return enrolled;
         }
 
         public void cancelFingerprint() {
@@ -282,6 +281,17 @@ public class DoorGodService extends Service {
                 // cancel fingerprint auth here.
                 cancellationSignal.cancel();
             }
+        }
+
+        public String getCurrentAppName() {
+            for (AppInfo info : mProtectedAppList) {
+                if (info.getAppPackageName().equals(currentLockedApp)) {
+                    return info.getAppName();
+                }
+            }
+
+            // otherwise it is ourselves
+            return getString(R.string.app_name);
         }
 
         private void removeAllProtectedApp() {

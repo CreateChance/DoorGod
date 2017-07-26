@@ -130,6 +130,10 @@ public class SettingsActivity extends AppCompatActivity {
                     Toast.makeText(SettingsActivity.this, R.string.settings_trust_wifi_not_init_info, Toast.LENGTH_LONG).show();
                 }
                 break;
+            case R.id.intru_rec:
+                Intent intent = new Intent(SettingsActivity.this, IntrusionRecordSettingActivity.class);
+                startActivity(intent);
+                break;
             default:
                 break;
         }

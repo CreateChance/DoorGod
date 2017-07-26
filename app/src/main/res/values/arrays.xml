@@ -9,4 +9,12 @@
         <item>@string/pattern_more_settings_anim_scale</item>
         <item>@string/pattern_more_settings_anim_trans</item>
     </string-array>
+
+    <string-array name="intru_rec_attempts_times">
+        <item>1 Attempts</item>
+        <item>2 Attempts</item>
+        <item>3 Attempts</item>
+        <item>4 Attempts</item>
+        <item>5 Attempts</item>
+    </string-array>
 </resources>

@@ -19,6 +19,7 @@ import com.createchance.doorgod.R;
 import com.createchance.doorgod.database.LockInfo;
 import com.createchance.doorgod.service.DoorGodService;
 import com.createchance.doorgod.ui.AppListActivity;
+import com.createchance.doorgod.ui.AuthFailed;
 import com.createchance.doorgod.ui.DoorGodActivity;
 import com.createchance.doorgod.util.FingerprintAuthResponse;
 import com.createchance.doorgod.util.LogUtil;
@@ -44,6 +45,8 @@ public class PinLockFragment extends Fragment {
 
     private DoorGodService.ServiceBinder mService;
 
+    private AuthFailed mCallback;
+
     private PinLockListener mPinLockListener = new PinLockListener() {
         @Override
         public void onComplete(String pin) {
@@ -63,6 +66,8 @@ public class PinLockFragment extends Fragment {
                         R.string.fragment_pin_lock_view_pin_error, Toast.LENGTH_SHORT).show();
                 indicatorDots.setPinLength(0);
                 pinLockView.resetPinLockView();
+                // tell this error.
+                mCallback.onFailed();
             }
         }
 
@@ -76,6 +81,10 @@ public class PinLockFragment extends Fragment {
             indicatorDots.setPinLength(pinLength);
         }
     };
+
+    public void setCallback(AuthFailed callback) {
+        this.mCallback = callback;
+    }
 
     @Nullable
     @Override
@@ -159,6 +168,8 @@ public class PinLockFragment extends Fragment {
                 break;
             case FingerprintAuthResponse.MSG_AUTH_FAILED:
                 fingerprintInfo.setText(R.string.fingerprint_auth_failed);
+                // tell this error.
+                mCallback.onFailed();
                 break;
             case FingerprintAuthResponse.MSG_AUTH_ERROR:
                 fingerprintInfo.setText(R.string.fingerprint_auth_error);

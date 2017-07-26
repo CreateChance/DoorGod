@@ -51,6 +51,13 @@
     <string name="settings_trust_wifi_select_reverse">Reverse</string>
     <string name="settings_trust_wifi_connected">Connected</string>
     <string name="settings_trust_wifi_not_init_info">WIFI disabled, please turn on.</string>
+    <string name="settings_intru_rec_title">Intrusion Record Setting</string>
+    <string name="settings_intru_rec_attempt_times_title">Failed unlock attempts</string>
+    <string name="settings_intru_rec_enabled_title">Intrusion Record</string>
+    <string name="settings_intru_rec_enabled_subtext">Capture a photo of user if unlock failed.</string>
+    <string name="settings_intru_rec_detail_title">Intrusion Record Details</string>
+    <string name="settings_intru_rec_detail_item_title">This guy try to access %2$s at %1$s</string>
+    <string name="settings_intru_rec_detail_dialog_title">Are you sure to delete?</string>
 
     <string name="first_start_info">This is first start, please set a lock type.</string>
 

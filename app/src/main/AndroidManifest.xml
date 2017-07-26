@@ -23,7 +23,7 @@
             android:name=".ui.AppListActivity"
             android:excludeFromRecents="true"
             android:exported="false"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
 
         <service
             android:name=".service.DoorGodService"
@@ -61,9 +61,12 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".ui.TrustedWifiSettingActivity"
+        <activity
+            android:name=".ui.TrustedWifiSettingActivity"
             android:excludeFromRecents="true"
-            android:exported="false"/>
+            android:exported="false" />
+        <activity android:name=".ui.IntrusionRecordSettingActivity" />
+        <activity android:name=".ui.IntrusionRecordDetailsActivity"></activity>
     </application>
 
 </manifest>

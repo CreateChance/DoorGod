@@ -20,6 +20,7 @@ import com.createchance.doorgod.R;
 import com.createchance.doorgod.database.LockInfo;
 import com.createchance.doorgod.service.DoorGodService;
 import com.createchance.doorgod.ui.AppListActivity;
+import com.createchance.doorgod.ui.AuthFailed;
 import com.createchance.doorgod.ui.DoorGodActivity;
 import com.createchance.doorgod.util.FingerprintAuthResponse;
 import com.createchance.doorgod.util.LogUtil;
@@ -41,12 +42,18 @@ public class PatternLockFragment extends Fragment {
 
     private DoorGodService.ServiceBinder mService;
 
+    private AuthFailed mCallback;
+
     private SharedPreferences mPrefs;
     private static final String LOCK_ENROLL_STATUS = "com.createchance.doorgod.LOCK_ENROLL_STATUS";
     private static final String LOCK_ANIM = "LOCK_ANIM";
 
     public PatternLockFragment() {
         // Required empty public constructor
+    }
+
+    public void setCallback(AuthFailed callback) {
+        this.mCallback = callback;
     }
 
     @Override
@@ -84,6 +91,8 @@ public class PatternLockFragment extends Fragment {
                 } else {
                     Toast.makeText(getActivity(),
                             R.string.fragment_pattern_view_pattern_error, Toast.LENGTH_SHORT).show();
+                    // tell this error
+                    mCallback.onFailed();
                     //patternView.setDisplayMode(PatternView.DisplayMode.Wrong);
                     //patternView.clearPattern(500);
                 }
@@ -180,6 +189,8 @@ public class PatternLockFragment extends Fragment {
                 break;
             case FingerprintAuthResponse.MSG_AUTH_FAILED:
                 fingerprintInfo.setText(R.string.fingerprint_auth_failed);
+                // tell this error.
+                mCallback.onFailed();
                 break;
             case FingerprintAuthResponse.MSG_AUTH_ERROR:
                 fingerprintInfo.setText(R.string.fingerprint_auth_error);

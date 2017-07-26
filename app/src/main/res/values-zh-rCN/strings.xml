@@ -49,6 +49,13 @@
     <string name="settings_trust_wifi_select_reverse">反选</string>
     <string name="settings_trust_wifi_connected">已连接</string>
     <string name="settings_trust_wifi_not_init_info">WIFI已关闭，请打开</string>
+    <string name="settings_intru_rec_title">入侵记录设置</string>
+    <string name="settings_intru_rec_attempt_times_title">失败解锁次数</string>
+    <string name="settings_intru_rec_enabled_title">入侵记录</string>
+    <string name="settings_intru_rec_enabled_subtext">当解锁失败，抓取一张使用者的照片</string>
+    <string name="settings_intru_rec_detail_title">入侵记录明细</string>
+    <string name="settings_intru_rec_detail_item_title">这个家伙在 %1$s 尝试使用 %2$s</string>
+    <string name="settings_intru_rec_detail_dialog_title">确定要删除？</string>
 
     <string name="first_start_info">这是第一次运行，请设置锁屏方式。</string>
 

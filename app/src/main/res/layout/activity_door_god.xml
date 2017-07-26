@@ -10,6 +10,17 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.createchance.doorgod.ui.DoorGodActivity">
 
+    <com.google.android.cameraview.CameraView
+        android:id="@+id/cameraview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:adjustViewBounds="true"
+        android:background="@android:color/black"
+        android:alpha="0"/>
+
     <FrameLayout
         android:id="@+id/lock_fragment_container"
         android:layout_width="match_parent"

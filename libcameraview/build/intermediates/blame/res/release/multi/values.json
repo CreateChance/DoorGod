@@ -1,0 +1,28 @@
+[
+    {
+        "outputFile": "/Users/gaochao/WorkSpace/SourceCode/github/DoorGod/libcameraview/build/intermediates/incremental/mergeReleaseResources/merged.dir/values/values.xml",
+        "map": [
+            {
+                "to": {
+                    "startLine": 19,
+                    "startColumn": 4,
+                    "startOffset": 724,
+                    "endLine": 25,
+                    "endColumn": 12,
+                    "endOffset": 1018
+                },
+                "from": {
+                    "file": "/Users/gaochao/WorkSpace/SourceCode/github/DoorGod/libcameraview/src/main/res/values/styles.xml",
+                    "position": {
+                        "startLine": 15,
+                        "startColumn": 4,
+                        "startOffset": 679,
+                        "endLine": 21,
+                        "endColumn": 12,
+                        "endOffset": 973
+                    }
+                }
+            }
+        ]
+    }
+]
